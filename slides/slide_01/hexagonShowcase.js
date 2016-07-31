@@ -376,7 +376,7 @@ pt.hexagonShowcase.gooey = function( ) {
 		.transition().duration(2000).delay(10000)
 		.style("opacity", 0);
 
-	if(pt.hexagonShowcase.direction === "forward") d3.select("#hexagon-showcase").attr("data-autoslide", 3000);
+	if(pt.hexagonShowcase.direction === "forward") d3.select("#hexagon-showcase").attr("data-autoslide", 3300);
 
 
 }//gooey

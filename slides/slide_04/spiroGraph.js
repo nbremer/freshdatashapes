@@ -312,7 +312,7 @@ pt.spiroGraph.spiro5 = function() {
 pt.spiroGraph.spiro6 = function() {
 
 	d3.selectAll("#spiroGraph .spirograph")
-		.transition("disappear").duration(500)
+		.transition("disappear").duration(250)
 		.style("opacity", 0)
 		.remove();
 
@@ -343,7 +343,7 @@ pt.spiroGraph.spiro6 = function() {
 pt.spiroGraph.spiro7 = function() {
 
 	d3.selectAll("#spiroGraph .spirograph")
-		.transition("disappear").duration(500)
+		.transition("disappear").duration(250)
 		.style("opacity", 0)
 		.remove();
 
@@ -360,7 +360,7 @@ pt.spiroGraph.spiro7 = function() {
 pt.spiroGraph.spiro8 = function() {
 
 	d3.selectAll("#spiroGraph .spirograph")
-		.transition("disappear").duration(500)
+		.transition("disappear").duration(250)
 		.style("opacity", 0)
 		.remove();
 
@@ -373,66 +373,66 @@ pt.spiroGraph.spiro8 = function() {
 
 }//spiro
 
-//Add an envelope form
-pt.spiroGraph.spiro9 = function() {
+// //Add an envelope form
+// pt.spiroGraph.spiro9 = function() {
 
-	d3.selectAll("#spiroGraph .spirograph")
-		.transition("disappear").duration(500)
-		.style("opacity", 0)
-		.remove();
+// 	d3.selectAll("#spiroGraph .spirograph")
+// 		.transition("disappear").duration(500)
+// 		.style("opacity", 0)
+// 		.remove();
 
-	//"#FC3A51", "#0E2430"
-	//"#CE1836", "#009989"
-	//R, r, rho, alpha, k, start, steps
-	var envelope1 = pt.spiroGraph.svg.append("path")
-		.attr("class", "spirograph")
-		.attr("d", pt.spiroGraph.line(pt.spiroGraph.plotEnvelope(12, 4, 1, 0, 60, 0, 7385)) ) 
-		//.attr("d", pt.spiroGraph.line(pt.spiroGraph.plotEnvelope(8, 4, 1, 0, 64, 0, 8000)) )
-		.attr("transform", "scale(15)")
-		.style("mix-blend-mode", "multiply")
-		.style("stroke-width", 0.1)
-		.style("opacity", 0)
-		.style("stroke", "#FC3A51");
+// 	//"#FC3A51", "#0E2430"
+// 	//"#CE1836", "#009989"
+// 	//R, r, rho, alpha, k, start, steps
+// 	var envelope1 = pt.spiroGraph.svg.append("path")
+// 		.attr("class", "spirograph")
+// 		.attr("d", pt.spiroGraph.line(pt.spiroGraph.plotEnvelope(12, 4, 1, 0, 60, 0, 7385)) ) 
+// 		//.attr("d", pt.spiroGraph.line(pt.spiroGraph.plotEnvelope(8, 4, 1, 0, 64, 0, 8000)) )
+// 		.attr("transform", "scale(15)")
+// 		.style("mix-blend-mode", "multiply")
+// 		.style("stroke-width", 0.1)
+// 		.style("opacity", 0)
+// 		.style("stroke", "#FC3A51");
 
-	envelope1
-		.transition("appear1").duration(1000)
-		.style("opacity", 1);
+// 	envelope1
+// 		.transition("appear1").duration(1000)
+// 		.style("opacity", 1);
 
-	var envelope2 = pt.spiroGraph.svg.append("path")
-		.attr("class", "spirograph")
-		//.attr("d", pt.spiroGraph.line(pt.spiroGraph.plotEnvelope(8, 4, 1, 45, 64, 0, 8000)) )
-		.attr("d", pt.spiroGraph.line(pt.spiroGraph.plotEnvelope(12, 4, 1, 60, 60, 0, 7385)) )
-		.attr("transform", "scale(15)")
-		.style("mix-blend-mode", "multiply")
-		.style("stroke-width", 0.1)
-		.style("opacity", 0)
-		.style("stroke", "#0E2430");
+// 	var envelope2 = pt.spiroGraph.svg.append("path")
+// 		.attr("class", "spirograph")
+// 		//.attr("d", pt.spiroGraph.line(pt.spiroGraph.plotEnvelope(8, 4, 1, 45, 64, 0, 8000)) )
+// 		.attr("d", pt.spiroGraph.line(pt.spiroGraph.plotEnvelope(12, 4, 1, 60, 60, 0, 7385)) )
+// 		.attr("transform", "scale(15)")
+// 		.style("mix-blend-mode", "multiply")
+// 		.style("stroke-width", 0.1)
+// 		.style("opacity", 0)
+// 		.style("stroke", "#0E2430");
 
-	envelope2
-		.transition("appear2").duration(1000)
-		.style("opacity", 1);
+// 	envelope2
+// 		.transition("appear2").duration(1000)
+// 		.style("opacity", 1);
 
 
-	//d3.select("#spiro-graph").attr("data-autoslide", 0);
-	//pt.spiroGraph.direction = "backward";
+// 	//d3.select("#spiro-graph").attr("data-autoslide", 0);
+// 	//pt.spiroGraph.direction = "backward";
 
-}//spiro
+// }//spiro
 
-pt.spiroGraph.plotEnvelope = function(R, r, rho, alpha, k, start, steps) {
-    alpha = alpha * Math.PI / 180;
+// pt.spiroGraph.plotEnvelope = function(R, r, rho, alpha, k, start, steps) {
+//     alpha = alpha * Math.PI / 180;
     
-    //Create the x and y coordinates for the spirograph and put these in a variable
-	var lineData = [];
-    for(var theta = start; theta < (start+steps); theta += 0.1){
-        var t = (Math.PI / 180) * theta ;
-        var x =  4*r*rho * Math.sin((R*t)/r)*Math.sin(t + alpha) + ( 4*r*(k+1)*rho * Math.sin((k*R*t)/(r*(k+1)))*Math.sin(t + alpha) ) / (k + 1);
-        var y = -4*r*rho * Math.sin((R*t)/r)*Math.cos(t + alpha) - ( 4*r*(k+1)*rho * Math.sin((k*R*t)/(r*(k+1)))*Math.cos(t + alpha) ) / (k + 1)  ;
+//     //Create the x and y coordinates for the spirograph and put these in a variable
+// 	var lineData = [];
+//     for(var theta = start; theta < (start+steps); theta += 0.1){
+//         var t = (Math.PI / 180) * theta ;
+//         var x =  4*r*rho * Math.sin((R*t)/r)*Math.sin(t + alpha) + ( 4*r*(k+1)*rho * Math.sin((k*R*t)/(r*(k+1)))*Math.sin(t + alpha) ) / (k + 1);
+//         var y = -4*r*rho * Math.sin((R*t)/r)*Math.cos(t + alpha) - ( 4*r*(k+1)*rho * Math.sin((k*R*t)/(r*(k+1)))*Math.cos(t + alpha) ) / (k + 1)  ;
 		
-        lineData.push({x: x, y: y});                               
-    }  
+//         lineData.push({x: x, y: y});                               
+//     }  
 	
-	return lineData;
-}//function plotEnvelope
+// 	return lineData;
+// }//function plotEnvelope
 
 
 

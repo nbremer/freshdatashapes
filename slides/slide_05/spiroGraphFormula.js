@@ -53,7 +53,7 @@ pt.spiroGraphFormula.init = function() {
 	pt.spiroGraphFormula.line = d3.svg.line()
 		.x(function(d) { return d.x; })
 		.y(function(d) { return d.y; });
-		
+
 }//init
 
 pt.spiroGraphFormula.resetOpacity = function() {

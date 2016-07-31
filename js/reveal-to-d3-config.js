@@ -163,12 +163,8 @@ function removeSVGs() {
   //Remove (heavy) all existing svgs currently running
   d3.select('#hexagon-showcase #hexagonShowcase svg').remove();
 
-  clearInterval(pt.guilloche.Interval);
-
   //Make the planet timer stop
-  window.cancelAnimationFrame(pt.exoplanets.planetsRotating);
+  pt.exoplanets.keepPlanetsRotating = false;
   pt.exoplanets.stopTooltip = true;
 
-
-
-}
+}//removeSVGs

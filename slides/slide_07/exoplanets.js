@@ -39,7 +39,7 @@ pt.exoplanets.init = function(planets) {
 	//Planet orbit variables
 	//The larger this is the more accurate the speed is
 	pt.exoplanets.resolution = 1, //perhaps make slider?
-	pt.exoplanets.speedUp = 300,//400,
+	pt.exoplanets.speedUp = 500,
 	pt.exoplanets.au = 149597871, //km
 	pt.exoplanets.radiusSun = 695800, //km
 	pt.exoplanets.radiusJupiter = 69911, //km
@@ -130,10 +130,8 @@ pt.exoplanets.setupPlanets = function(planets) {
 	//////////////////////// Make the planets rotate //////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
-	(function animloop(){
-		pt.exoplanets.planetsRotating = requestAnimFrame(animloop);
-		pt.exoplanets.movePlanets();
-	})();
+	pt.exoplanets.keepPlanetsRotating = true;
+    pt.exoplanets.movePlanets();
 
 	pt.exoplanets.direction = "forward";
 
@@ -141,7 +139,7 @@ pt.exoplanets.setupPlanets = function(planets) {
 
 pt.exoplanets.rotatePlanets = function() {
 
-	pt.exoplanets.speedUp = 400;
+	pt.exoplanets.speedUp = 500;
 
 	//Bring all planets back
 	pt.exoplanets.bringBack(delayTime = 0); 
@@ -164,7 +162,7 @@ pt.exoplanets.draw0 = function() {
 	pt.exoplanets.stopTooltip = true;	
 
 	//Speed up for the slides
-	pt.exoplanets.speedUp = 100;
+	pt.exoplanets.speedUp = 250;
 							
 	//Start
 	pt.exoplanets.startCircle(time = 29/pt.exoplanets.storySpeedUp);
@@ -343,7 +341,7 @@ pt.exoplanets.draw5 = function() {
 		.transition().delay(0).duration(500)
 		.style("opacity", 1);
 	
-	setTimeout(function() { pt.exoplanets.speedUp = 50; }, 700*8/pt.exoplanets.storySpeedUp);
+	setTimeout(function() { pt.exoplanets.speedUp = 70; }, 700*8/pt.exoplanets.storySpeedUp);
 			
 }//draw5
 
@@ -357,7 +355,7 @@ pt.exoplanets.draw6 = function() {
 	pt.exoplanets.changeText("", delayDisappear = 0, delayAppear = 1);
 
 	//Return planets to original speed
-	pt.exoplanets.speedUp = 400;
+	pt.exoplanets.speedUp = 500;
 	
 	//Bring all planets back
 	pt.exoplanets.bringBack(delayTime = 1); 
@@ -586,6 +584,10 @@ pt.exoplanets.movePlanets = function() {
     
       	ctx.closePath();
 	}//for i
+
+	if ( pt.exoplanets.keepPlanetsRotating ) {
+        setTimeout(pt.exoplanets.movePlanets, 10);
+    }//if
 
 
 }//movePlanets
