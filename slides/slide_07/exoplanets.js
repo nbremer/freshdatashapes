@@ -5,7 +5,7 @@ planets = planets.filter(function(d) {
 	return d.r < 1000;
 });
 
-pt.exoplanets.init = function(planets) {
+pt.exoplanets.init = function() {
 
 	//Remove any existing svgs
 	d3.select('#exo-planets #exoplanets svg').remove();
@@ -64,12 +64,6 @@ pt.exoplanets.init = function(planets) {
 
 	//Array of all IDs
 	pt.exoplanets.IDs = _.pluck(planets, "ID");
-
-	pt.exoplanets.setupPlanets(planets);
-
-}//init
-
-pt.exoplanets.setupPlanets = function(planets) {
 
 	///////////////////////////////////////////////////////////////////////////
 	///////////////////////////////// Colors //////////////////////////////////
@@ -131,12 +125,11 @@ pt.exoplanets.setupPlanets = function(planets) {
 	///////////////////////////////////////////////////////////////////////////
 
 	pt.exoplanets.keepPlanetsRotating = true;
-	pt.exoplanets.Interval = isMobile ? 500 : 10;
-    pt.exoplanets.movePlanets();
+    if(!isMobile) pt.exoplanets.movePlanets();
 
 	pt.exoplanets.direction = "forward";
 
-}//setupPlanets
+}//init
 
 pt.exoplanets.rotatePlanets = function() {
 
@@ -587,7 +580,7 @@ pt.exoplanets.movePlanets = function() {
 	}//for i
 
 	if ( pt.exoplanets.keepPlanetsRotating ) {
-        setTimeout(pt.exoplanets.movePlanets, pt.exoplanets.Interval);
+        setTimeout(pt.exoplanets.movePlanets, 10);
     }//if
 
 
