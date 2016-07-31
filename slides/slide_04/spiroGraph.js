@@ -302,7 +302,7 @@ pt.spiroGraph.spiro5 = function() {
 		pt.spiroGraph.addHypo(4*130, 4*30, 0.9, (360/(13*7))*i, color, 6, 4000);
 	}//for i
 
-	if(pt.spiroGraph.direction === "forward") d3.select("#spiro-graph").attr("data-autoslide", 550);
+	//if(pt.spiroGraph.direction === "forward") d3.select("#spiro-graph").attr("data-autoslide", 550);
 
 }//spiro
 
@@ -410,7 +410,7 @@ pt.spiroGraph.spiro9 = function() {
 		.style("opacity", 1);
 
 
-	d3.select("#spiro-graph").attr("data-autoslide", 0);
+	//d3.select("#spiro-graph").attr("data-autoslide", 0);
 	pt.spiroGraph.direction = "backward";
 
 }//spiro
