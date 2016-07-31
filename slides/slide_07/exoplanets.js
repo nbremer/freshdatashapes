@@ -131,6 +131,7 @@ pt.exoplanets.setupPlanets = function(planets) {
 	///////////////////////////////////////////////////////////////////////////
 
 	pt.exoplanets.keepPlanetsRotating = true;
+	pt.exoplanets.Interval = isMobile ? 500 : 10;
     pt.exoplanets.movePlanets();
 
 	pt.exoplanets.direction = "forward";
@@ -586,7 +587,7 @@ pt.exoplanets.movePlanets = function() {
 	}//for i
 
 	if ( pt.exoplanets.keepPlanetsRotating ) {
-        setTimeout(pt.exoplanets.movePlanets, 10);
+        setTimeout(pt.exoplanets.movePlanets, pt.exoplanets.Interval);
     }//if
 
 

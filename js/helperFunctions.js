@@ -4,6 +4,8 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
 	is_safari = true;
 }
 
+var isMobile = window.matchMedia("only screen and (max-width: 760px)").matches;
+
 //Function to only run once after the last transition ends
 function endall(transition, callback) { 
 	var n = 0; 
