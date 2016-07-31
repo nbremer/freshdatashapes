@@ -125,7 +125,7 @@ pt.exoplanets.init = function() {
 	///////////////////////////////////////////////////////////////////////////
 
 	pt.exoplanets.keepPlanetsRotating = true;
-    if(!isMobile) pt.exoplanets.movePlanets();
+    pt.exoplanets.movePlanets();
 
 	pt.exoplanets.direction = "forward";
 
@@ -173,7 +173,6 @@ pt.exoplanets.draw0 = function() {
 	pt.exoplanets.changeText("Here we have WASP-12 b, one of the biggest planets in our dataset. " +
 			   "Its radius is more than 20x bigger than Earth", 
 				delayDisappear = 7/pt.exoplanets.storySpeedUp, delayAppear = 8/pt.exoplanets.storySpeedUp);
-
 
 	pt.exoplanets.changeText("As comparison, here we have Kepler-68 c, which is about the same size as Earth. " + 
 			   "It's so small in comparison to the rest that you can barely see it",
@@ -533,8 +532,13 @@ pt.exoplanets.movePlanets = function() {
 		var theta = d.theta * Math.PI / 180;
 
 		var radius = pt.exoplanets.radiusSizer*d.Radius;
-		var centerX = pt.exoplanets.locate(d, "x") + pt.exoplanets.width/2;
-		var centerY = pt.exoplanets.locate(d, "y") + pt.exoplanets.height/2;
+		if ( !isMobile ) { 
+			var centerX = pt.exoplanets.locate(d, "x") + pt.exoplanets.width/2;
+			var centerY = pt.exoplanets.locate(d, "y") + pt.exoplanets.height/2;
+		} else {
+			var centerX = d.x + pt.exoplanets.width/2;
+			var centerY = d.y + pt.exoplanets.height/2;
+		}//else
 
 		//Get the gradient for this planet
 		var gradientOffset = radius < 3 ? radius*0.5 : radius*0.8;
@@ -579,7 +583,7 @@ pt.exoplanets.movePlanets = function() {
       	ctx.closePath();
 	}//for i
 
-	if ( pt.exoplanets.keepPlanetsRotating ) {
+	if ( pt.exoplanets.keepPlanetsRotating && !isMobile ) {
         setTimeout(pt.exoplanets.movePlanets, 10);
     }//if
 
@@ -641,7 +645,10 @@ pt.exoplanets.shrinkPlanets = function(delayTime) {
 	function shrink() {
 		var decrease = easeIn( iteration++ * 0.05 ) ;
 		pt.exoplanets.radiusSizer = originalSizer - deltaSizer * decrease;
-		if( pt.exoplanets.radiusSizer <= finalSizer ) { clearInterval(shrinkInterval); }
+		if( pt.exoplanets.radiusSizer <= finalSizer ) { 
+			clearInterval(shrinkInterval);
+			if ( isMobile ) { pt.exoplanets.movePlanets(); }
+		}//if
 	}//shrink
 
 }//shrinkPlanets
@@ -666,7 +673,10 @@ pt.exoplanets.growPlanets = function(delayTime) {
 	function grow() {
 		var decrease = easeIn( iteration++ * 0.05 ) ;
 		pt.exoplanets.radiusSizer = originalSizer - deltaSizer * decrease;
-		if ( pt.exoplanets.radiusSizer >= finalSizer ) { clearInterval(growInterval); } 
+		if ( pt.exoplanets.radiusSizer >= finalSizer ) { 
+			clearInterval(growInterval); 
+			if ( isMobile ) { pt.exoplanets.movePlanets(); }
+		}//if
 	}//grow
 
 }//growPlanets
@@ -681,14 +691,12 @@ pt.exoplanets.showEllipse = function(i, opacity) {
 	var planet = i;
 
 	//Find the planet to highlight
-	planets.forEach(function(d,i) {
-		if(d.ID === planet) { d.stroke = true; }
-	});
+	planets.forEach(function(d,i) { if(d.ID === planet) { d.stroke = true; } });
+	if ( isMobile ) { pt.exoplanets.movePlanets(); }
 
 	setTimeout(function() {
-		planets.forEach(function(d,i) {
-			if(d.ID === planet) { d.stroke = false; }
-		});
+		planets.forEach(function(d,i) { if(d.ID === planet) { d.stroke = false; } });
+		if ( isMobile ) { pt.exoplanets.movePlanets(); }
 	}, 3000);
 
 }//showEllipse	
@@ -703,6 +711,8 @@ pt.exoplanets.highlight = function(planet, delayTime){
 	planets.forEach(function(d,i) {
 		if(d.ID === planet) { d.stroke = true; }
 	});
+
+	if ( isMobile ) { pt.exoplanets.movePlanets(); }
 	
 }//highlight
 
@@ -731,7 +741,10 @@ pt.exoplanets.bringBack = function(delayTime){
 	function fadeIn() {
 		var decrease = easeIn( iteration++ * 0.075 ) ;
 		pt.exoplanets.ctx.globalAlpha = originalAlpha - deltaAlpha * decrease;
-		if( pt.exoplanets.ctx.globalAlpha >= finalAlpha ) { clearInterval(fadeInInterval); }
+		if( pt.exoplanets.ctx.globalAlpha >= finalAlpha ) { 
+			if ( isMobile ) { pt.exoplanets.movePlanets(); }
+			clearInterval(fadeInInterval); 
+		}
 	}//fadeIn
 
 }//bringBack
@@ -761,7 +774,10 @@ pt.exoplanets.dim = function(delayTime) {
 	function fadeOut() {
 		var decrease = easeIn( iteration++ * 0.075 ) ;
 		pt.exoplanets.ctx.globalAlpha = originalAlpha - deltaAlpha * decrease;
-		if( pt.exoplanets.ctx.globalAlpha <= finalAlpha ) { clearInterval(fadeOutInterval); }
+		if( pt.exoplanets.ctx.globalAlpha <= finalAlpha ) { 
+			if ( isMobile ) { pt.exoplanets.movePlanets(); }
+			clearInterval(fadeOutInterval); 
+		}
 	}//fadeOut
 
 }//dim

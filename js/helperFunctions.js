@@ -2,7 +2,7 @@
 var is_safari = false;
 if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) { is_safari = true; }
 
-var isMobile = window.matchMedia("only screen and ( max-width: 1030px )").matches;
+var isMobile = window.matchMedia("only screen and ( max-width: 1050px )").matches;
 
 //Function to only run once after the last transition ends
 function endall(transition, callback) { 

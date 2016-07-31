@@ -54,6 +54,8 @@ pt.spiroGraphFormula.init = function() {
 		.x(function(d) { return d.x; })
 		.y(function(d) { return d.y; });
 
+	pt.spiroGraphFormula.direction = "forward";
+
 }//init
 
 pt.spiroGraphFormula.resetOpacity = function() {
@@ -67,8 +69,10 @@ pt.spiroGraphFormula.resetOpacity = function() {
 		.transition().duration(500)
 		.style("opacity", 1);
 
-	d3.select(".slide-background.stack.present").selectAll(".slide-background.present")
-		.style("background-image", "none");
+	if( pt.spiroGraphFormula.direction === "backward") {
+		d3.select(".slide-background.stack.present").selectAll(".slide-background.present")
+			.style("background-image", "none");
+	}//if
 
 	// d3.select(".spiro-img")
 	// 	.transition().duration(500)
@@ -77,6 +81,8 @@ pt.spiroGraphFormula.resetOpacity = function() {
 }//resetOpacity
 
 pt.spiroGraphFormula.showSpiros = function() {
+
+	pt.spiroGraphFormula.direction = "backward";
 
 	//Make formula less visible
 	d3.selectAll("#spiro-graph-formula .formula")
