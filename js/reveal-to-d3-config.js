@@ -165,8 +165,8 @@ function removeSVGs() {
 
   clearInterval(pt.guilloche.Interval);
 
-  //Make the planet d3 timer stop
-  pt.exoplanets.keepPlanetsRotating = true;
+  //Make the planet timer stop
+  window.cancelAnimationFrame(pt.exoplanets.planetsRotating);
   pt.exoplanets.stopTooltip = true;
 
 

@@ -6,7 +6,7 @@ planets = planets.filter(function(d) {
 });
 
 pt.exoplanets.init = function(planets) {
-	
+
 	//Remove any existing svgs
 	d3.select('#exo-planets #exoplanets svg').remove();
 
@@ -14,28 +14,23 @@ pt.exoplanets.init = function(planets) {
 	//////////////////// Set up and initiate svg containers ///////////////////
 	///////////////////////////////////////////////////////////////////////////	
 
-	var margin = {
-		top: 0,
-		right: 0,
-		bottom: 0,
-		left: 0
-	};
+	//Create canvas
+    pt.exoplanets.canvas = document.getElementById("exoCanvas");
+    pt.exoplanets.canvas.width = $(".slides").width();
+    pt.exoplanets.canvas.height = $(".slides").height();
+    pt.exoplanets.ctx = pt.exoplanets.canvas.getContext('2d');
 	
-	pt.exoplanets.width = $(".slides").width() - margin.left - margin.right;
-	pt.exoplanets.height = $(".slides").height() - margin.top - margin.bottom;
+	pt.exoplanets.width = $(".slides").width();
+	pt.exoplanets.height = $(".slides").height();
 				
 	//SVG container
 	pt.exoplanets.svg = d3.select('#exo-planets #exoplanets')
 		.append("svg")
-		.attr("width", pt.exoplanets.width + margin.left + margin.right)
-		.attr("height", pt.exoplanets.height + margin.top + margin.bottom);
+		.attr("width", pt.exoplanets.width)
+		.attr("height", pt.exoplanets.height);
 		
 	pt.exoplanets.container = pt.exoplanets.svg.append("g")
-		.attr("transform", "translate(" + (margin.left + pt.exoplanets.width/2) + "," + (margin.top + pt.exoplanets.height/2) + ")");
-
-	//Remove tooltip when clicking anywhere in body
-	d3.select("#exoplanets")
-		.on("click", function(d) { pt.exoplanets.stopTooltip = true; });
+		.attr("transform", "translate(" + (pt.exoplanets.width/2) + "," + (pt.exoplanets.height/2) + ")");
 
 	///////////////////////////////////////////////////////////////////////////
 	////////////////////// Star and planet variables //////////////////////////
@@ -52,23 +47,20 @@ pt.exoplanets.init = function(planets) {
 	pt.exoplanets.radiusSizer = 6, //Size increaser of radii of planets
 	pt.exoplanets.planetOpacity = 0.6;
 	pt.exoplanets.stopTooltip = true;
-
 	pt.exoplanets.storySpeedUp = 6;
+
+	pt.exoplanets.ctx.strokeStyle = 'white';
+	pt.exoplanets.ctx.globalAlpha = pt.exoplanets.planetOpacity;
 
 	//Format with 2 decimals
 	pt.exoplanets.formatSI = d3.format(".2f");
 
-	//Create star in the Middle - scaled to the orbits
+	//Star in the Middle - scaled to the orbits
 	//Radius of our Sun in these coordinates (taking into account size of circle inside image)
 	var ImageWidth = pt.exoplanets.radiusSun/pt.exoplanets.au * 3000 * (2.7/1.5);
-	pt.exoplanets.container.append("svg:image")
-		.attr("x", -ImageWidth)
-		.attr("y", -ImageWidth)
-		.attr("class", "sun")
-		.attr("xlink:href", "slides/slide_07/img/sun.png")
-		.attr("width", ImageWidth*2)
-		.attr("height", ImageWidth*2)
-		.attr("text-anchor", "middle");	
+	d3.select(".sun")
+		.attr("width", ImageWidth*2 + "px")
+		.attr("height", ImageWidth*2 + "px");
 
 	//Array of all IDs
 	pt.exoplanets.IDs = _.pluck(planets, "ID");
@@ -85,86 +77,9 @@ pt.exoplanets.setupPlanets = function(planets) {
 
 	//Create color gradient for planets based on the temperature of the star that they orbit
 	var colors = ["#FB1108","#FD150B","#FA7806","#FBE426","#FCFB8F","#F3F5E7","#C7E4EA","#ABD6E6","#9AD2E1","#42A1C1","#1C5FA5", "#172484"];
-	var colorScale = d3.scale.linear()
+	pt.exoplanets.colorScale = d3.scale.linear()
 		  .domain([2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 14000, 20000, 30000]) // Temperatures
 		  .range(colors);
-
-	//Create the gradients for the planet fill
-	//Radial gradient with the center at one end of the circle, as if illuminated from the side
-	//A gradient is created for each planet and colored to the temperature of its star
-	var gradientContainer = pt.exoplanets.container.append("defs");
-
-	var gradientRadial = gradientContainer
-		.selectAll("radialGradient").data(planets).enter()
-		.append("radialGradient")
-		.attr("cx", "50%")
-		.attr("cy", "50%")
-		.attr("r", "50%")
-		.attr("fx", "0%")
-		.attr("gradientUnits", "objectBoundingBox")
-		.attr('id', function(d){return "gradientRadial-"+d.ID})
-
-	gradientRadial.append("stop")
-		.attr("offset", "0%")
-		.attr("stop-color", function(d) {return d3.rgb(colorScale(d.temp)).brighter(1);});
-
-	gradientRadial.append("stop")
-		.attr("offset", "40%")
-		.attr("stop-color", function(d) {return colorScale(d.temp);});
-		 
-	gradientRadial.append("stop")
-		.attr("offset",  "100%")
-		.attr("stop-color", function(d) {return d3.rgb(colorScale(d.temp)).darker(1.75);});
-
-	///////////////////////////////////////////////////////////////////////////
-	//////////////////////////// Create Scales ////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////
-
-	//Set scale for radius of circles
-	var rScale = d3.scale.linear()
-		.range([1, 20])
-		.domain([0, d3.max(planets, function(d) { return d.Radius; })]);	
-
-	///////////////////////////////////////////////////////////////////////////
-	/////////////////////////// Plot and move planets /////////////////////////
-	///////////////////////////////////////////////////////////////////////////
-
-	//Drawing a line for the orbit
-	var orbitsContainer = pt.exoplanets.container.append("g").attr("class","orbitsContainer");
-	var orbits = orbitsContainer.selectAll("g.orbit")
-					.data(planets).enter().append("ellipse")
-					.attr("class", "orbit")
-					.attr("cx", function(d) {return d.cx;})
-					.attr("cy", function(d) {return d.cy;})
-					.attr("rx", function(d) {return d.major;})
-					.attr("ry", function(d) {return d.minor;})
-					.style("fill", "#3E5968")
-					.style("fill-opacity", 0)
-					.style("stroke", "white")
-					.style("stroke-opacity", 0);	
-
-	//Drawing the planets			
-	var planetContainer = pt.exoplanets.container.append("g").attr("class","planetContainer");
-	var planets = planetContainer.selectAll("g.planet")
-					.data(planets).enter()				
-					.append("circle")
-					.attr("class", "planet")
-					.attr("r", function(d) {return pt.exoplanets.radiusSizer*d.Radius;})
-					.attr("cx", function(d) {return d.x;})
-					.attr("cy", function(d) {return d.y;})
-					.style("fill", function(d){return "url(#gradientRadial-" + d.ID + ")";})
-					.style("fill-opacity", pt.exoplanets.planetOpacity)
-					.style("stroke-opacity", 0)
-					.style("stroke-width", "3px")
-					.style("stroke", "white")
-					// .on("mouseover", function(d, i) {
-					// 	pt.exoplanets.stopTooltip = false					
-					// 	pt.exoplanets.showTooltip(d);
-					// 	pt.exoplanets.showEllipse(d, i, 0.8);
-					// })
-					// .on("mouseout", function(d, i) {
-					// 	//pt.exoplanets.showEllipse(d, i, 0);
-					// });
 
 	///////////////////////////////////////////////////////////////////////////
 	//////////////////////////// Explanation Texts ////////////////////////////
@@ -211,39 +126,14 @@ pt.exoplanets.setupPlanets = function(planets) {
 		.style("fill", "white")
 		.style("opacity", 0);
 
-
-	pt.exoplanets.counter = 1;
-	//Order of steps when clicking button
-	d3.select(".progressWrapper")      
-		.on("click", function(e){
-
-			if(pt.exoplanets.counter === 1) pt.exoplanets.draw1();
-			else if(pt.exoplanets.counter === 2) pt.exoplanets.draw2();
-			else if(pt.exoplanets.counter === 3) pt.exoplanets.draw3();
-			else if(pt.exoplanets.counter === 4) pt.exoplanets.draw4();
-			else if(pt.exoplanets.counter === 5) pt.exoplanets.draw5();
-			else if(pt.exoplanets.counter === 6) pt.exoplanets.draw6();
-			
-			pt.exoplanets.counter += 1;
-		});
-
 	///////////////////////////////////////////////////////////////////////////
 	//////////////////////// Make the planets rotate //////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
-	//Change x and y location of each planet
-	pt.exoplanets.keepPlanetsRotating = false;
-	d3.timer(function() {       		
-		//Move the planet - DO NOT USE TRANSITION
-		d3.selectAll(".planet")
-			.attr("cx", pt.exoplanets.locate("x"))
-			.attr("cy", pt.exoplanets.locate("y"))
-			.attr("transform", function(d) {
-				return "rotate(" + (d.theta%360) + "," + d.x + "," + d.y + ")";
-			});		
-
-		return pt.exoplanets.keepPlanetsRotating;		
-	});
+	(function animloop(){
+		pt.exoplanets.planetsRotating = requestAnimFrame(animloop);
+		pt.exoplanets.movePlanets();
+	})();
 
 	pt.exoplanets.direction = "forward";
 
@@ -254,10 +144,10 @@ pt.exoplanets.rotatePlanets = function() {
 	pt.exoplanets.speedUp = 400;
 
 	//Bring all planets back
-	pt.exoplanets.bringBack(opacity = pt.exoplanets.planetOpacity, delayTime = 1); 
+	pt.exoplanets.bringBack(delayTime = 0); 
 
 	//Loop through tooltips
-	pt.exoplanets.tooltipLoop();
+	pt.exoplanets.tooltipLoop(false);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -270,15 +160,11 @@ pt.exoplanets.draw0 = function() {
 
 	//Make the tooltips stop
 	clearInterval(pt.exoplanets.randomExoplanet);
+	//Stop any visible tooltips that might still be there
+	pt.exoplanets.stopTooltip = true;	
 
 	//Speed up for the slides
 	pt.exoplanets.speedUp = 100;
-
-	//Stop any visible tooltips that might still be there
-	pt.exoplanets.stopTooltip = true;
-
-	//Remove event listeners during examples
-	pt.exoplanets.removeEvents();
 							
 	//Start
 	pt.exoplanets.startCircle(time = 29/pt.exoplanets.storySpeedUp);
@@ -290,7 +176,7 @@ pt.exoplanets.draw0 = function() {
 	pt.exoplanets.dim(delayTime = 0/pt.exoplanets.storySpeedUp);
 	
 	//Highlight the biggest planet
-	pt.exoplanets.highlight(1223, delayTime=8/pt.exoplanets.storySpeedUp);
+	pt.exoplanets.highlight(1223, delayTime = 8/pt.exoplanets.storySpeedUp);
 				
 	pt.exoplanets.changeText("Here we have WASP-12 b, one of the biggest planets in our dataset. " +
 			   "Its radius is more than 20x bigger than Earth", 
@@ -322,28 +208,23 @@ pt.exoplanets.draw1 = function() {
 
 	pt.exoplanets.storySpeedUp = 2;
 
-	pt.exoplanets.startCircle(time = 5/pt.exoplanets.storySpeedUp);
+	pt.exoplanets.startCircle(time = 11/pt.exoplanets.storySpeedUp);
 	
 	pt.exoplanets.changeText("Scaling the planetary radii to the orbits would give you this result. " +
 			   "(The star in the center was already scaled to our Sun)",
 				delayDisappear = 0/pt.exoplanets.storySpeedUp, delayAppear = 3/pt.exoplanets.storySpeedUp);
 				
-	//Dim all planets
-	pt.exoplanets.dim(delayTime = 0/pt.exoplanets.storySpeedUp);
 	//Bring all planets back
-	pt.exoplanets.bringBack(opacity = pt.exoplanets.planetOpacity, delayTime = 1/pt.exoplanets.storySpeedUp); 
+	pt.exoplanets.bringBack(delayTime = 1/pt.exoplanets.storySpeedUp); 
 		
 	//Scale to the new radius
-	d3.selectAll(".planet")
-		.transition().delay(700 * 2 / pt.exoplanets.storySpeedUp).duration(2000/pt.exoplanets.storySpeedUp)
-		.attr("r", function(d) {
-			var newRadius = pt.exoplanets.radiusJupiter/pt.exoplanets.au*3000*d.Radius;
-			if  (newRadius < 1) {return 0;}
-			else {return newRadius;}
-		});
+	pt.exoplanets.shrinkPlanets(delayTime = 2/pt.exoplanets.storySpeedUp);
+
+	//Make planets bigger
+	pt.exoplanets.growPlanets(delayTime = 8/pt.exoplanets.storySpeedUp);
 
 	if(pt.exoplanets.direction === "forward") {
-		d3.select("#exo-planets").attr("data-autoslide", 6000/pt.exoplanets.storySpeedUp);
+		d3.select("#exo-planets").attr("data-autoslide", 10000/pt.exoplanets.storySpeedUp);
 	}//if
 
 }//function Draw1
@@ -359,10 +240,6 @@ pt.exoplanets.draw2 = function() {
 	
 	//Dim all planets again
 	pt.exoplanets.dim(delayTime = 0/pt.exoplanets.storySpeedUp);
-	//Make planets bigger again
-	d3.selectAll(".planet")
-		.transition().delay(700 * 1 / pt.exoplanets.storySpeedUp).duration(1500/pt.exoplanets.storySpeedUp)
-		.attr("r", function(d) {return pt.exoplanets.radiusSizer * d.Radius;});		
 
 	//Highlight the biggest planet
 	pt.exoplanets.highlight(1223, delayTime = 4/pt.exoplanets.storySpeedUp);
@@ -458,10 +335,7 @@ pt.exoplanets.draw5 = function() {
 			   "when it is close to the star? If you want to know why that happens, " +
 			   "please look up Kepler's 2nd law",
 				delayDisappear = 8/pt.exoplanets.storySpeedUp, delayAppear = 9/pt.exoplanets.storySpeedUp, xloc=200, yloc = -24*2);
-	
-	//In case you move backward
-	pt.exoplanets.removeEvents();
-	//Make the tooltips stop
+
 	clearInterval(pt.exoplanets.randomExoplanet);
 
 	//Show the progress wrapper - in case you move backward
@@ -482,14 +356,11 @@ pt.exoplanets.draw6 = function() {
 	//Remove text
 	pt.exoplanets.changeText("", delayDisappear = 0, delayAppear = 1);
 
-	//Bring back events
-	pt.exoplanets.resetEvents();
-
 	//Return planets to original speed
 	pt.exoplanets.speedUp = 400;
 	
 	//Bring all planets back
-	pt.exoplanets.bringBack(opacity = pt.exoplanets.planetOpacity, delayTime = 1); 
+	pt.exoplanets.bringBack(delayTime = 1); 
 
 	//Hide the progress wrapper
 	d3.select(".progressWrapper")
@@ -497,7 +368,7 @@ pt.exoplanets.draw6 = function() {
 		.style("opacity", 0);
 
 	//Loop through tooltips
-	pt.exoplanets.tooltipLoop();
+	pt.exoplanets.tooltipLoop(true);
 
 	pt.exoplanets.direction === "backward";
 	d3.select("#exo-planets").attr("data-autoslide", 0);
@@ -506,7 +377,7 @@ pt.exoplanets.draw6 = function() {
 
 
 //Randomly show and hide exoplanets with orbits and tooltips
-pt.exoplanets.tooltipLoop = function() {
+pt.exoplanets.tooltipLoop = function(doTooltip) {
 
 	pt.exoplanets.randomExoplanet = setInterval(function () {
 		pt.exoplanets.stopTooltip = true
@@ -514,15 +385,14 @@ pt.exoplanets.tooltipLoop = function() {
 		var chosenPlanet = Math.max(0, Math.round(Math.random()*planets.length) - 1);
 		chosenPlanet = pt.exoplanets.IDs[chosenPlanet];
 
-		setTimeout(function() { 
-			pt.exoplanets.stopTooltip = false;
-			pt.exoplanets.showTooltip("none", chosenPlanet);
-		}, 100);							
+		if(doTooltip) {
+			setTimeout(function() { 
+				pt.exoplanets.stopTooltip = false;
+				pt.exoplanets.showTooltip(chosenPlanet);
+			}, 100);
+		}							
 		
-		pt.exoplanets.showEllipse("none", chosenPlanet, 1);
-
-		//pt.exoplanets.highlight(chosenPlanet);
-
+		pt.exoplanets.showEllipse(chosenPlanet, 1);
 	}, 1500);
 
 }//tooltipLoop
@@ -532,19 +402,13 @@ pt.exoplanets.tooltipLoop = function() {
 ///////////////////////////////////////////////////////////////////////////	
 
 //Show the tooltip on hover
-pt.exoplanets.showTooltip = function(d, i) {	
+pt.exoplanets.showTooltip = function(i) {	
 
-	if( typeof i !== "undefined") {
-		d = planets.filter(function(p) { return p.ID === i; })[0];
-	} else {
-		//Show how to close tooltip
-		d3.select("#tooltipInfo").style("visibility", "visible");
-	}//else
+	d = planets.filter(function(p) { return p.ID === i; })[0];
 	
 	//Make a different offset for really small planets
-	//var Offset = (rScale(d.Radius)/2 < 2) ? 3 : rScale(d.Radius)/2;
 	var xOffset = (10*d.Radius)/2;
-	var yOffset = (10*d.Radius)/2;
+	var yOffset = (15*d.Radius)/2;
 
 	//Set first location of tooltip and change opacity
 	var xpos = d.x + pt.exoplanets.width/2 - xOffset;
@@ -560,7 +424,7 @@ pt.exoplanets.showTooltip = function(d, i) {
 	//returns true (when the user clicks)
 	d3.timer(function() { 
 	  xpos = d.x + pt.exoplanets.width/2 - xOffset - ((10*d.Radius)/2 < 3 ? 10 : 5);
-	  ypos = d.y + pt.exoplanets.height/2 - yOffset;
+	  ypos = d.y + pt.exoplanets.height/2 - yOffset - ((15*d.Radius)/2 < 3 ? 10 : 5);
 	  
 	 //Keep changing the location of the tooltip
 	 d3.select("#tooltip")
@@ -570,8 +434,6 @@ pt.exoplanets.showTooltip = function(d, i) {
 		//Breaks from the timer function when stopTooltip is changed to true
 		//by another function
 		if (pt.exoplanets.stopTooltip == true) { 
-			//Hide tooltip info again
-			d3.select("#tooltipInfo").style("visibility", "hidden");
 			//Hide tooltip
 			d3.select("#tooltip").transition().duration(300)
 				.style('opacity',0)
@@ -582,13 +444,12 @@ pt.exoplanets.showTooltip = function(d, i) {
 				});	
 			//Remove show how to close
 			return pt.exoplanets.stopTooltip;
-		}
+		}//if
 	});
 
 	//Change the texts inside the tooltip
 	d3.select("#tooltip .tooltip-planet").text(d.name);
 	d3.select("#tooltip .tooltip-year").html("Discovered in: " + d.discovered);
-	//d3.select("#tooltip-class").html("Temperature of star: " + d.temp + " Kelvin");
 	d3.select("#tooltip-period").html("Orbital period: " + pt.exoplanets.formatSI(d.period) + " days");
 	d3.select("#tooltip-eccen").html("Eccentricity of orbit: " + d.e);
 	d3.select("#tooltip-radius").html("Radius of planet: " + pt.exoplanets.formatSI(d.Radius * 11.209 ) + " Earth radii");
@@ -666,12 +527,76 @@ pt.exoplanets.changeText = function(newText, delayDisappear, delayAppear, xloc, 
 }//changeText 
 
 ///////////////////////////////////////////////////////////////////////////
-//////////////////////// Planet helper functions //////////////////////////
+////////////////////////// Draw the planets ///////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
+pt.exoplanets.movePlanets = function() {
+
+	var ctx = pt.exoplanets.ctx;
+	ctx.clearRect(0, 0, pt.exoplanets.width, pt.exoplanets.height);
+
+	for(var i = 0; i < planets.length; i++) {
+
+		var d = planets[i];
+		var theta = d.theta * Math.PI / 180;
+
+		var radius = pt.exoplanets.radiusSizer*d.Radius;
+		var centerX = pt.exoplanets.locate(d, "x") + pt.exoplanets.width/2;
+		var centerY = pt.exoplanets.locate(d, "y") + pt.exoplanets.height/2;
+
+		//Get the gradient for this planet
+		var gradientOffset = radius < 3 ? radius*0.5 : radius*0.8;
+		var radialGradient = ctx.createRadialGradient(centerX - gradientOffset*Math.cos(theta), centerY - gradientOffset*Math.sin(theta), 0, centerX, centerY, radius);
+		radialGradient.addColorStop(0, d3.rgb(pt.exoplanets.colorScale(d.temp)).brighter(1) );
+		radialGradient.addColorStop(0.4, pt.exoplanets.colorScale(d.temp) );
+		radialGradient.addColorStop(1, d3.rgb(pt.exoplanets.colorScale(d.temp)).darker(1.75) );
+
+      	if(d.stroke) {
+      		var globalAlphaOld = ctx.globalAlpha;
+
+      		//Find the focal point offset
+      		var focal = Math.sqrt(d.major*d.major - d.minor*d.minor);
+      		//Draw the orbit
+      		ctx.beginPath();
+      		ctx.ellipse(pt.exoplanets.width/2 + focal, pt.exoplanets.height/2, d.major, d.minor, 0, 2 * Math.PI, false);
+      		ctx.globalAlpha = globalAlphaOld/3;
+      		ctx.fillStyle = "#3E5968";
+      		ctx.fill();
+      		ctx.globalAlpha = 0.8;
+      		ctx.lineWidth = 1;
+      		ctx.stroke();
+      		ctx.closePath();
+      		ctx.globalAlpha = 1;
+
+      	}//if
+
+		ctx.beginPath();
+      	ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      	ctx.fillStyle = radialGradient;
+      	ctx.fill();
+
+      	if(d.stroke) {
+      		//Stroke the circle
+      		ctx.lineWidth = 3;
+      		ctx.stroke();
+
+      		//Reset the opacity
+      		ctx.globalAlpha = globalAlphaOld;
+      	}//if
+    
+      	ctx.closePath();
+	}//for i
+
+
+}//movePlanets
+
+///////////////////////////////////////////////////////////////////////////
+/////////////////////// Calculate location of planets /////////////////////
+///////////////////////////////////////////////////////////////////////////	
+
 //Calculate the new x or y position per planet
-pt.exoplanets.locate = function(coord) {
-	return function(d){
+pt.exoplanets.locate = function(d, coord) {
+	//return function(d){
 		var k = 360 * d.major * d.minor / (d.period * pt.exoplanets.resolution * pt.exoplanets.speedUp);
 		
 		for (var i = 0; i < pt.exoplanets.resolution; i++) {
@@ -694,34 +619,82 @@ pt.exoplanets.locate = function(coord) {
 			d.y = newY;
 			return newY;
 		}
-	};
+	//};
 }//locate
 
+///////////////////////////////////////////////////////////////////////////
+//////////////////////// Change radius of planets /////////////////////////
+///////////////////////////////////////////////////////////////////////////	
+
+//Scale to the new radius
+pt.exoplanets.shrinkPlanets = function(delayTime) {
+	
+	if(typeof(delayTime)==='undefined') delayTime = 0;
+	var time = 100/pt.exoplanets.storySpeedUp;
+	
+	var originalSizer = 6;
+	var finalSizer = pt.exoplanets.radiusJupiter/pt.exoplanets.au*3000;
+	var deltaSizer = originalSizer - finalSizer;
+
+	var iteration = 0;
+	var shrinkInterval;
+	setTimeout(function () {
+		shrinkInterval = setInterval(shrink, time);
+	}, 700 * delayTime);
+	
+	function shrink() {
+		var decrease = easeIn( iteration++ * 0.05 ) ;
+		pt.exoplanets.radiusSizer = originalSizer - deltaSizer * decrease;
+		if( pt.exoplanets.radiusSizer <= finalSizer ) { clearInterval(shrinkInterval); }
+	}//shrink
+
+}//shrinkPlanets
+
+
+//Scale to the new radius
+pt.exoplanets.growPlanets = function(delayTime) {
+	
+	if(typeof(delayTime)==='undefined') delayTime = 0;
+	var time = 100/pt.exoplanets.storySpeedUp;
+	
+	var originalSizer = pt.exoplanets.radiusJupiter/pt.exoplanets.au*3000;
+	var finalSizer = 6;
+	var deltaSizer = originalSizer - finalSizer;
+
+	var iteration = 0;
+	var growInterval;
+	setTimeout(function () {
+		growInterval = setInterval(grow, time);
+	}, 700 * delayTime);
+	
+	function grow() {
+		var decrease = easeIn( iteration++ * 0.05 ) ;
+		pt.exoplanets.radiusSizer = originalSizer - deltaSizer * decrease;
+		if ( pt.exoplanets.radiusSizer >= finalSizer ) { clearInterval(growInterval); } 
+	}//grow
+
+}//growPlanets
+
+///////////////////////////////////////////////////////////////////////////
+/////////////////////// Change strokes and orbits /////////////////////////
+///////////////////////////////////////////////////////////////////////////	
+
 //Show the total orbit of the hovered over planet
-pt.exoplanets.showEllipse = function(d, i, opacity) {
-		var planet = i;
-		//console.log(d);
-		//var duration = (opacity == 0 ? 2000 : 100) / pt.exoplanets.storySpeedUp; //If the opacity is zero slowly remove the orbit line
-		
-		//Highlight the chosen planet
-		d3.selectAll(".planet")
-			.filter(function(d, i) {return d.ID === planet;})
-			.transition().duration(100)
-			.style("stroke-opacity", opacity * 1.25)
-			.style("fill-opacity", 1)
-			.transition().duration(2000).delay(3000)
-			.style("stroke-opacity", 0)
-			.style("fill-opacity", pt.exoplanets.planetOpacity);
-		
-		//Select the orbit with the same index as the planet
-		d3.selectAll(".orbit")
-			.filter(function(d, i) {return d.ID === planet;})
-			.transition().duration(100)
-			.style("stroke-opacity", opacity)
-			.style("fill-opacity", opacity/3)
-			.transition().duration(2000).delay(3000)
-			.style("stroke-opacity", 0)
-			.style("fill-opacity", 0);
+pt.exoplanets.showEllipse = function(i, opacity) {
+	
+	var planet = i;
+
+	//Find the planet to highlight
+	planets.forEach(function(d,i) {
+		if(d.ID === planet) { d.stroke = true; }
+	});
+
+	setTimeout(function() {
+		planets.forEach(function(d,i) {
+			if(d.ID === planet) { d.stroke = false; }
+		});
+	}, 3000);
+
 }//showEllipse	
 
 //Highlight the chosen planet and its orbit
@@ -729,108 +702,71 @@ pt.exoplanets.highlight = function(planet, delayTime){
 	if(typeof(delayTime)==='undefined') delayTime = 0;
 	//if(typeof(tooltip)==='undefined') tooltip = true;
 	var time = 1000/pt.exoplanets.storySpeedUp;
+
+	//Find the planet to highlight
+	planets.forEach(function(d,i) {
+		if(d.ID === planet) { d.stroke = true; }
+	});
 	
-	//Highlight the chosen planet
-	d3.selectAll(".planet")
-		.filter(function(d, i) {return d.ID === planet;})
-		.transition().delay(700 * delayTime).duration(time)
-		.style("stroke-opacity", 1)
-		.style("fill-opacity", 1);
-	
-	//Select the orbit with the same index as the planet
-	d3.selectAll(".orbit")
-		.filter(function(d, i) {return d.ID === planet;})
-		.transition().delay(700 * delayTime).duration(time)
-		.style("stroke-opacity", 0.8)
-		.style("fill-opacity", 0.2);
 }//highlight
 
 
 //Function to bring opacity back of all planets
-pt.exoplanets.bringBack = function(opacity, delayTime){
+pt.exoplanets.bringBack = function(delayTime){
+
+	//Reset stroke of all planets
+	planets.forEach(function(d,i) {
+		d.stroke = false;
+	});
+
 	if(typeof(delayTime)==='undefined') delayTime = 0;
-	var time = 500/pt.exoplanets.storySpeedUp;
+	var time = 100/pt.exoplanets.storySpeedUp;
 	
-	//Change opacity of all
-	d3.selectAll(".planet")
-		.transition().delay(700 * delayTime).duration(time)
-		.style("stroke-opacity", 0)
-		.style("fill-opacity", opacity);
+	var originalAlpha = pt.exoplanets.ctx.globalAlpha;
+	var finalAlpha = pt.exoplanets.planetOpacity;
+	var deltaAlpha = originalAlpha - finalAlpha;
 
-	//Hide orbits
-	//Select the orbit with the same index as the planet
-	d3.selectAll(".orbit")
-		.transition().delay(700 * delayTime).duration(time)
-		.style("stroke-opacity", 0)
-		.style("fill-opacity", 0);
+	var iteration = 0;
+	var fadeInInterval;
+	setTimeout(function () {
+		fadeInInterval = setInterval(fadeIn, time);
+	}, 700 * delayTime);
+	
+	function fadeIn() {
+		var decrease = easeIn( iteration++ * 0.075 ) ;
+		pt.exoplanets.ctx.globalAlpha = originalAlpha - deltaAlpha * decrease;
+		if( pt.exoplanets.ctx.globalAlpha >= finalAlpha ) { clearInterval(fadeInInterval); }
+	}//fadeIn
+
 }//bringBack
-
-
-// //Dim all other planets (and orbits)
-// pt.exoplanets.dimOne = function(planet, delayTime) {
-// 	if(typeof(delayTime)==='undefined') delayTime = 0;
-// 	var time = 500/pt.exoplanets.storySpeedUp;
-	
-// 	//Dim all other planets
-// 	d3.selectAll(".planet")
-// 		.filter(function(d, i) {return i == planet;})
-// 		.transition().delay(700 * delayTime).duration(time)
-// 		.style("stroke-opacity", 0)
-// 		.style("opacity", 0.1);	
-		
-// 	//Select the orbit with the same index as the planet
-// 	d3.selectAll(".orbit")
-// 		.filter(function(d, i) {return i == planet;})
-// 		.transition().delay(700 * delayTime).duration(time)
-// 		.style("stroke-opacity", 0)
-// 		.style("fill-opacity", 0);	
-// }//dimOne
 
 
 //Dim all planets (and orbits)
 pt.exoplanets.dim = function(delayTime) {
+
+	//Reset stroke of all planets
+	planets.forEach(function(d,i) {
+		d.stroke = false;
+	});
+
 	if(typeof(delayTime)==='undefined') delayTime = 0;
-	var time = 1000/pt.exoplanets.storySpeedUp;
+	var time = 100/pt.exoplanets.storySpeedUp;
 	
-	//Dim all other planets
-	d3.selectAll(".planet")
-		.transition().delay(700 * delayTime).duration(time)
-		.style("stroke-opacity", 0)
-		.style("fill-opacity", 0.1);	
-		
-	//Select the orbit with the same index as the planet
-	d3.selectAll(".orbit")
-		.transition().delay(700 * delayTime).duration(time)
-		.style("stroke-opacity", 0)
-		.style("fill-opacity", 0);	
+	var originalAlpha = pt.exoplanets.ctx.globalAlpha;
+	var finalAlpha = 0.1;
+	var deltaAlpha = originalAlpha - finalAlpha;
+
+	var iteration = 0;
+	var fadeOutInterval;
+	setTimeout(function () {
+		fadeOutInterval = setInterval(fadeOut, time);
+	}, 700 * delayTime);
+
+	function fadeOut() {
+		var decrease = easeIn( iteration++ * 0.075 ) ;
+		pt.exoplanets.ctx.globalAlpha = originalAlpha - deltaAlpha * decrease;
+		if( pt.exoplanets.ctx.globalAlpha <= finalAlpha ) { clearInterval(fadeOutInterval); }
+	}//fadeOut
+
 }//dim
-
-///////////////////////////////////////////////////////////////////////////
-//////////////////////// Set / hide interactivity /////////////////////////
-///////////////////////////////////////////////////////////////////////////
-
-//Remove all events
-pt.exoplanets.removeEvents = function() {
-	//Remove event listeners during examples
-	d3.selectAll('.planet').on('mouseover', null).on('mouseout', null);
-	d3.select("svg").on("click", null);
-}//removeEvents
-	
-//Reset all events
-pt.exoplanets.resetEvents = function() {	
-	//Replace planet events
-	d3.selectAll('.planet')
-		.on("mouseover", function(d, i) {
-			pt.exoplanets.stopTooltip = false					
-			pt.exoplanets.showTooltip(d);
-			pt.exoplanets.showEllipse(d, i, 0.8);
-		})
-		.on("mouseout", function(d, i) {
-			pt.exoplanets.showEllipse(d, i, 0);
-		});
-		
-	//Replace click event
-	d3.select("#exoplanets")
-		.on("click", function(d) { pt.exoplanets.stopTooltip = true; });
-}//resetEvents
 

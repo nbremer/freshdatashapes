@@ -99,33 +99,45 @@
 	  text-align:center;  
 	  margin-bottom: 4px;
 	}
-	#exo-planets.tooltip-info {
-	  color:#333333;
-	  font-size: 12px;  
-	  text-align:center;  
-	  overflow:hidden;
-	  margin-bottom: 2px;
-	}
 
 	#exo-planets.progressWrapper {
 		cursor: pointer;
 		z-index: 1;
 	}
+
+	#exo-planets .sun {
+		position: absolute; 
+		top: 540px; 
+		left: 960px;
+		transform: translate(-50%, -50%);
+		margin: 0;
+		max-height: 100%;
+		max-width: 100%;
+	}
+
+	#exo-planets #exoplanets svg {
+		position: absolute; 
+		top: 0%; 
+		left: 0%; 
+	}
+
 </style>
 
 <section id="exo-planets" data-background-image="slides/slide_07/img/galaxy.jpg" data-background-size="500px" data-background-repeat="repeat">
 
-	<div id="exoplanets"></div>
-	<span class="fragment"></span>
-	<span class="fragment"></span>
-	<span class="fragment"></span>
-	<span class="fragment"></span>
-	<span class="fragment"></span>
-	<span class="fragment"></span>
-	<span class="fragment"></span>
+	<img class="sun" src="slides/slide_07/img/sun.png"/>
 
-	<!-- Show how to close tooltip -->
-	<div id="tooltipInfo"><span>Click anywhere in the screen to close tooltips</span></div>
+	<div id="exoplanets">
+		<canvas id="exoCanvas" width="400" height="400"></canvas>
+	</div>
+
+	<span class="fragment"></span>
+	<span class="fragment"></span>
+	<span class="fragment"></span>
+	<span class="fragment"></span>
+	<span class="fragment"></span>
+	<span class="fragment"></span>
+	<span class="fragment"></span>
 
 	<!-- Create div structure for Tooltip -->
 	<div id="tooltip">
