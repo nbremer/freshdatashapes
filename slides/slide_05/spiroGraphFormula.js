@@ -70,9 +70,9 @@ pt.spiroGraphFormula.resetOpacity = function() {
 	d3.select(".slide-background.stack.present").selectAll(".slide-background.present")
 		.style("background-image", "none");
 
-	d3.select(".spiro-img")
-		.transition().duration(500)
-		.style("opacity", 1);
+	// d3.select(".spiro-img")
+	// 	.transition().duration(500)
+	// 	.style("opacity", 1);
 
 }//resetOpacity
 
@@ -93,9 +93,9 @@ pt.spiroGraphFormula.showSpiros = function() {
 			.style("background-image", "url('slides/slide_05/spiro-background.png')");
 		}, 1000);
 
-	d3.select(".spiro-img")
-		.transition().duration(1000).delay(7000)
-		.style("opacity", 0);
+	// d3.select(".spiro-img")
+	// 	.transition().duration(1000).delay(7000)
+	// 	.style("opacity", 0);
 
 	//Calculate and draw the spirographs
 	setTimeout(pt.spiroGraphFormula.drawSpiros,500);
