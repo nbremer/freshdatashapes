@@ -18,7 +18,7 @@ pt.spiroGraphFormula.init = function() {
 	
 	var width = $(".slides").width() - margin.left - margin.right;
 	pt.spiroGraphFormula.width = width;
-	var height = $(".slides").height() - margin.top - margin.bottom;
+	var height = $(".slides").height() - margin.top - margin.bottom - 60;
 	pt.spiroGraphFormula.height = height;
 				
 	//SVG container
@@ -53,32 +53,49 @@ pt.spiroGraphFormula.init = function() {
 	pt.spiroGraphFormula.line = d3.svg.line()
 		.x(function(d) { return d.x; })
 		.y(function(d) { return d.y; });
-
-	pt.spiroGraphFormula.direction = "forward";
-
-	d3.selectAll("#spiro-graph-formula .formula").style("color", "#adadad");
-
+		
 }//init
 
-pt.spiroGraphFormula.moveOn = function() {
+pt.spiroGraphFormula.resetOpacity = function() {
+	
+	//Show everything (in case you move backward)
+	d3.selectAll("#spiro-graph-formula .formula")
+		.transition().duration(250)
+		.style("color", "#adadad");
 
+	d3.select("#formulaWrapper")
+		.transition().duration(500)
+		.style("opacity", 1);
+
+	d3.select(".slide-background.stack.present").selectAll(".slide-background.present")
+		.style("background-image", "none");
+
+	d3.select(".spiro-img")
+		.transition().duration(500)
+		.style("opacity", 1);
+
+}//resetOpacity
+
+pt.spiroGraphFormula.showSpiros = function() {
+
+	//Make formula less visible
 	d3.selectAll("#spiro-graph-formula .formula")
 		.transition().duration(750)
 		.style("color", "#e2e2e2");
 
-	if(pt.spiroGraphFormula.direction === "forward") {
-		d3.select("#spiro-graph-formula").attr("data-autoslide", 500);
-	}//if
-}//moveOn
+	//Change the background
+	setTimeout(function() {
+		d3.select("#formulaWrapper")
+			.transition().duration(1000)
+			.style("opacity", 0);
 
-pt.spiroGraphFormula.showSpiros = function() {
+		d3.select(".slide-background.stack.present").selectAll(".slide-background.present")
+			.style("background-image", "url('slides/slide_05/spiro-background.png')");
+		}, 1000);
 
-	pt.spiroGraphFormula.direction = "backward";
-	d3.select("#spiro-graph-formula").attr("data-autoslide", 0);
-
-	// d3.select(".spiro-img")
-	// 	.transition().duration(2000).delay(6000)
-	// 	.style("opacity", 0);
+	d3.select(".spiro-img")
+		.transition().duration(1000).delay(7000)
+		.style("opacity", 0);
 
 	//Calculate and draw the spirographs
 	setTimeout(pt.spiroGraphFormula.drawSpiros,500);
@@ -149,7 +166,7 @@ pt.spiroGraphFormula.drawSpiros = function() {
 
 	//var colors = ["#2c7bb6", "#00a6ca","#00ccbc","#53D86A","#FFDC1E","#E76818","#d7191c","#ED008C","#760AAE"];	
 
-	for (var i = 0; i < 300; i++) {
+	for (var i = 0; i < 100; i++) {
 
 		var R = getRandomNumber(15, 100);
 		var r = getRandomNumber(2, (R * 0.95));

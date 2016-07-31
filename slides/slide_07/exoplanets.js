@@ -1,5 +1,10 @@
 pt.exoplanets = pt.exoplanets || {};
 
+//Only keep planets that are in the screen
+planets = planets.filter(function(d) {
+	return d.r < 1000;
+});
+
 pt.exoplanets.init = function(planets) {
 	
 	//Remove any existing svgs
@@ -64,6 +69,9 @@ pt.exoplanets.init = function(planets) {
 		.attr("width", ImageWidth*2)
 		.attr("height", ImageWidth*2)
 		.attr("text-anchor", "middle");	
+
+	//Array of all IDs
+	pt.exoplanets.IDs = _.pluck(planets, "ID");
 
 	pt.exoplanets.setupPlanets(planets);
 
@@ -149,14 +157,14 @@ pt.exoplanets.setupPlanets = function(planets) {
 					.style("stroke-opacity", 0)
 					.style("stroke-width", "3px")
 					.style("stroke", "white")
-					.on("mouseover", function(d, i) {
-						pt.exoplanets.stopTooltip = false					
-						pt.exoplanets.showTooltip(d);
-						pt.exoplanets.showEllipse(d, i, 0.8);
-					})
-					.on("mouseout", function(d, i) {
-						//pt.exoplanets.showEllipse(d, i, 0);
-					});
+					// .on("mouseover", function(d, i) {
+					// 	pt.exoplanets.stopTooltip = false					
+					// 	pt.exoplanets.showTooltip(d);
+					// 	pt.exoplanets.showEllipse(d, i, 0.8);
+					// })
+					// .on("mouseout", function(d, i) {
+					// 	//pt.exoplanets.showEllipse(d, i, 0);
+					// });
 
 	///////////////////////////////////////////////////////////////////////////
 	//////////////////////////// Explanation Texts ////////////////////////////
@@ -282,7 +290,7 @@ pt.exoplanets.draw0 = function() {
 	pt.exoplanets.dim(delayTime = 0/pt.exoplanets.storySpeedUp);
 	
 	//Highlight the biggest planet
-	pt.exoplanets.highlight(235, delayTime=8/pt.exoplanets.storySpeedUp);
+	pt.exoplanets.highlight(1223, delayTime=8/pt.exoplanets.storySpeedUp);
 				
 	pt.exoplanets.changeText("Here we have WASP-12 b, one of the biggest planets in our dataset. " +
 			   "Its radius is more than 20x bigger than Earth", 
@@ -294,7 +302,7 @@ pt.exoplanets.draw0 = function() {
 				delayDisappear = 16/pt.exoplanets.storySpeedUp, delayAppear = 17/pt.exoplanets.storySpeedUp);
 				
 	//Highlight an Earth like chosen planet
-	pt.exoplanets.highlight(215, delayTime = 17/pt.exoplanets.storySpeedUp);
+	pt.exoplanets.highlight(1106, delayTime = 17/pt.exoplanets.storySpeedUp);
 
 	pt.exoplanets.changeText("As a note, although the sizes of the planet are scaled, and the orbits are scaled, " + 
 			   "they are not scaled to each other. Otherwise most planets would become smaller than " +
@@ -357,7 +365,7 @@ pt.exoplanets.draw2 = function() {
 		.attr("r", function(d) {return pt.exoplanets.radiusSizer * d.Radius;});		
 
 	//Highlight the biggest planet
-	pt.exoplanets.highlight(235, delayTime = 4/pt.exoplanets.storySpeedUp);
+	pt.exoplanets.highlight(1223, delayTime = 4/pt.exoplanets.storySpeedUp);
 	pt.exoplanets.changeText("Let's get back to WASP-12 b. The distance to the star it orbits is only 2% of the distance " +
 			   "between the Earth and the Sun",
 				delayDisappear = 0/pt.exoplanets.storySpeedUp, delayAppear = 3/pt.exoplanets.storySpeedUp);
@@ -391,7 +399,7 @@ pt.exoplanets.draw3 = function() {
 				delayDisappear = 11/pt.exoplanets.storySpeedUp, delayAppear = 12/pt.exoplanets.storySpeedUp);	
 				
 	//Highlight an Earth like chosen planet
-	pt.exoplanets.highlight(215, delayTime = 16/pt.exoplanets.storySpeedUp);
+	pt.exoplanets.highlight(1106, delayTime = 16/pt.exoplanets.storySpeedUp);
 	pt.exoplanets.changeText("and Kepler-68 c in almost 10 days",
 				delayDisappear = 16/pt.exoplanets.storySpeedUp, delayAppear = 17/pt.exoplanets.storySpeedUp);			
 
@@ -444,7 +452,7 @@ pt.exoplanets.draw5 = function() {
 	pt.exoplanets.dim(delayTime = 0/pt.exoplanets.storySpeedUp);
 	
 	//Highlight elliptical orbit
-	pt.exoplanets.highlight(237, delayTime = 2/pt.exoplanets.storySpeedUp);
+	pt.exoplanets.highlight(1273, delayTime = 2/pt.exoplanets.storySpeedUp);
 
 	pt.exoplanets.changeText("Let me speed things up a bit. Do you see that the planet is moving faster " +
 			   "when it is close to the star? If you want to know why that happens, " +
@@ -504,6 +512,7 @@ pt.exoplanets.tooltipLoop = function() {
 		pt.exoplanets.stopTooltip = true
 
 		var chosenPlanet = Math.max(0, Math.round(Math.random()*planets.length) - 1);
+		chosenPlanet = pt.exoplanets.IDs[chosenPlanet];
 
 		setTimeout(function() { 
 			pt.exoplanets.stopTooltip = false;
@@ -526,7 +535,7 @@ pt.exoplanets.tooltipLoop = function() {
 pt.exoplanets.showTooltip = function(d, i) {	
 
 	if( typeof i !== "undefined") {
-		d = planets[i];
+		d = planets.filter(function(p) { return p.ID === i; })[0];
 	} else {
 		//Show how to close tooltip
 		d3.select("#tooltipInfo").style("visibility", "visible");
@@ -696,7 +705,7 @@ pt.exoplanets.showEllipse = function(d, i, opacity) {
 		
 		//Highlight the chosen planet
 		d3.selectAll(".planet")
-			.filter(function(d, i) {return i == planet;})
+			.filter(function(d, i) {return d.ID === planet;})
 			.transition().duration(100)
 			.style("stroke-opacity", opacity * 1.25)
 			.style("fill-opacity", 1)
@@ -706,7 +715,7 @@ pt.exoplanets.showEllipse = function(d, i, opacity) {
 		
 		//Select the orbit with the same index as the planet
 		d3.selectAll(".orbit")
-			.filter(function(d, i) {return i == planet;})
+			.filter(function(d, i) {return d.ID === planet;})
 			.transition().duration(100)
 			.style("stroke-opacity", opacity)
 			.style("fill-opacity", opacity/3)
@@ -723,14 +732,14 @@ pt.exoplanets.highlight = function(planet, delayTime){
 	
 	//Highlight the chosen planet
 	d3.selectAll(".planet")
-		.filter(function(d, i) {return i == planet;})
+		.filter(function(d, i) {return d.ID === planet;})
 		.transition().delay(700 * delayTime).duration(time)
 		.style("stroke-opacity", 1)
 		.style("fill-opacity", 1);
 	
 	//Select the orbit with the same index as the planet
 	d3.selectAll(".orbit")
-		.filter(function(d, i) {return i == planet;})
+		.filter(function(d, i) {return d.ID === planet;})
 		.transition().delay(700 * delayTime).duration(time)
 		.style("stroke-opacity", 0.8)
 		.style("fill-opacity", 0.2);

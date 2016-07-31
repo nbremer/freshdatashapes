@@ -62,10 +62,10 @@ pt.slideIdToFunctions = {
     'init': function() {
       pt.spiroGraphFormula.init();
     },
-    0: function() {
-      pt.spiroGraphFormula.moveOn();
+    '-1': function() {
+      pt.spiroGraphFormula.resetOpacity();
     },
-    1: function() {
+    0: function() {
       pt.spiroGraphFormula.showSpiros();
     }
   },

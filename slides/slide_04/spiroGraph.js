@@ -5,6 +5,9 @@ pt.spiroGraph.init = function() {
 	//Remove any existing svgs
 	d3.select('#spiro-graph #spiroGraph svg').remove();
 
+	d3.select(".slide-background.stack.present").selectAll(".slide-background.present")
+		.style("background-image", "none");
+
 	///////////////////////////////////////////////////////////////////////////
 	//////////////////// Set up and initiate svg containers ///////////////////
 	///////////////////////////////////////////////////////////////////////////	
@@ -56,7 +59,7 @@ pt.spiroGraph.init = function() {
 	pt.spiroGraph.colors = ["#2c7bb6", "#00a6ca","#00ccbc","#53D86A","#FFCB2F","#FE9526","#e76818","#d7191c"];	
 	pt.spiroGraph.numColors = pt.spiroGraph.colors.length;
 
-	pt.spiroGraph.direction = "forward";
+	//pt.spiroGraph.direction = "forward";
 
 }//init
 
@@ -411,7 +414,7 @@ pt.spiroGraph.spiro9 = function() {
 
 
 	//d3.select("#spiro-graph").attr("data-autoslide", 0);
-	pt.spiroGraph.direction = "backward";
+	//pt.spiroGraph.direction = "backward";
 
 }//spiro
 
