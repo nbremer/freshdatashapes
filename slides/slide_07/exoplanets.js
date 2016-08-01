@@ -47,7 +47,7 @@ pt.exoplanets.init = function() {
 	pt.exoplanets.radiusSizer = 6, //Size increaser of radii of planets
 	pt.exoplanets.planetOpacity = 0.6;
 	pt.exoplanets.stopTooltip = true;
-	pt.exoplanets.storySpeedUp = 6;
+	pt.exoplanets.storySpeedUp = 7;
 
 	pt.exoplanets.ctx.strokeStyle = 'white';
 	pt.exoplanets.ctx.globalAlpha = pt.exoplanets.planetOpacity;
@@ -124,14 +124,13 @@ pt.exoplanets.init = function() {
 	//////////////////////// Make the planets rotate //////////////////////////
 	///////////////////////////////////////////////////////////////////////////
 
-	pt.exoplanets.keepPlanetsRotating = true;
-    pt.exoplanets.movePlanets();
+	pt.exoplanets.rotatePlanets = requestAnimationFrame(pt.exoplanets.movePlanets);
 
 	pt.exoplanets.direction = "forward";
 
 }//init
 
-pt.exoplanets.rotatePlanets = function() {
+pt.exoplanets.startPlanets = function() {
 
 	pt.exoplanets.speedUp = 500;
 
@@ -140,7 +139,8 @@ pt.exoplanets.rotatePlanets = function() {
 
 	//Loop through tooltips
 	pt.exoplanets.tooltipLoop(false);
-}
+
+}//startPlanets
 
 ///////////////////////////////////////////////////////////////////////////
 //////////////////////// Storytelling steps ///////////////////////////////
@@ -148,7 +148,7 @@ pt.exoplanets.rotatePlanets = function() {
 
 pt.exoplanets.draw0 = function() {
 
-	pt.exoplanets.storySpeedUp = 6;
+	pt.exoplanets.storySpeedUp = 7;
 
 	//Make the tooltips stop
 	clearInterval(pt.exoplanets.randomExoplanet);
@@ -197,7 +197,7 @@ pt.exoplanets.draw1 = function() {
 
 	d3.select("#exo-planets").attr("data-autoslide", 0);
 
-	pt.exoplanets.storySpeedUp = 2;
+	pt.exoplanets.storySpeedUp = 3;
 
 	pt.exoplanets.startCircle(time = 11/pt.exoplanets.storySpeedUp);
 	
@@ -225,7 +225,7 @@ pt.exoplanets.draw2 = function() {
 
 	d3.select("#exo-planets").attr("data-autoslide", 0);
 
-	pt.exoplanets.storySpeedUp = 6;
+	pt.exoplanets.storySpeedUp = 7;
 
 	pt.exoplanets.startCircle(time = 26/pt.exoplanets.storySpeedUp);
 	
@@ -334,7 +334,7 @@ pt.exoplanets.draw5 = function() {
 		.transition().delay(0).duration(500)
 		.style("opacity", 1);
 	
-	setTimeout(function() { pt.exoplanets.speedUp = 70; }, 700*8/pt.exoplanets.storySpeedUp);
+	setTimeout(function() { pt.exoplanets.speedUp = 50; }, 700*8/pt.exoplanets.storySpeedUp);
 			
 }//draw5
 
@@ -370,21 +370,26 @@ pt.exoplanets.draw6 = function() {
 //Randomly show and hide exoplanets with orbits and tooltips
 pt.exoplanets.tooltipLoop = function(doTooltip) {
 
-	pt.exoplanets.randomExoplanet = setInterval(function () {
-		pt.exoplanets.stopTooltip = true
+	var counter = 0;
+	pt.exoplanets.stopTooltip = false;
 
+	//Continuously show exoplanets and on every third show the tooltip
+	pt.exoplanets.randomExoplanet = setInterval(function () {
+		
 		var chosenPlanet = Math.max(0, Math.round(Math.random()*planets.length) - 1);
 		chosenPlanet = pt.exoplanets.IDs[chosenPlanet];
 
-		if(doTooltip) {
+		if(doTooltip && counter%3 === 0) {
 			setTimeout(function() { 
-				pt.exoplanets.stopTooltip = false;
 				pt.exoplanets.showTooltip(chosenPlanet);
 			}, 100);
-		}							
+		}//if							
 		
 		pt.exoplanets.showEllipse(chosenPlanet, 1);
-	}, 1500);
+
+		counter +=1;
+
+	}, 500);
 
 }//tooltipLoop
 
@@ -423,8 +428,7 @@ pt.exoplanets.showTooltip = function(i) {
 		.style('left', xpos + "px");
 	
 		//Breaks from the timer function when stopTooltip is changed to true
-		//by another function
-		if (pt.exoplanets.stopTooltip == true) { 
+		if (pt.exoplanets.stopTooltip === true) { 
 			//Hide tooltip
 			d3.select("#tooltip").transition().duration(300)
 				.style('opacity',0)
@@ -583,8 +587,8 @@ pt.exoplanets.movePlanets = function() {
       	ctx.closePath();
 	}//for i
 
-	if ( pt.exoplanets.keepPlanetsRotating && !isMobile ) {
-        setTimeout(pt.exoplanets.movePlanets, 10);
+	if ( !isMobile ) {
+		pt.exoplanets.rotatePlanets = requestAnimationFrame(pt.exoplanets.movePlanets);
     }//if
 
 
