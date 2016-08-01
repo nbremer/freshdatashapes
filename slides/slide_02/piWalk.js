@@ -414,7 +414,7 @@ pt.piWalk.drawTenThousand = function() {
 		if(maxNumDraw < 1e4 && pt.piWalk.slideFragment === 2) {
 			pt.piWalk.ctx.clearRect(0,0,pt.piWalk.width,pt.piWalk.height);
 			pt.piWalk.drawGroup(maxNumDraw, 1);
-			setTimeout(drawInBatches, 5);
+			pt.piWalk.drawSteps = requestAnimationFrame( drawInBatches );
 		} else {
 			//Text styles for the legend
 			pt.piWalk.ctx.textBaseline = "middle"; 
