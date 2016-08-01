@@ -39,7 +39,9 @@ pt.spiroGraphFormula.showSpiros = function() {
 		.style("color", "#e2e2e2");
 
 	//Calculate and draw the spirographs
-	pt.spiroGraphFormula.drawSpiros();
+	setTimeout( function() {
+		pt.spiroGraphFormula.drawSpirographs = requestAnimationFrame(pt.spiroGraphFormula.setVariables);
+	}, 500);
 
 }//showSpiros
 
@@ -96,22 +98,6 @@ pt.spiroGraphFormula.calculateHypocycloid = function(R, r, rho, alpha, length, s
 	
 }//function calculateHypocycloid
 
-//Plot a spirograph
-pt.spiroGraphFormula.drawSpiros = function() {
-
-	pt.spiroGraphFormula.spiroInterval = setInterval( function() {
-
-		pt.spiroGraphFormula.setVariables();
-		pt.spiroGraphFormula.setVariables();
-		pt.spiroGraphFormula.setVariables();
-		pt.spiroGraphFormula.setVariables();
-		pt.spiroGraphFormula.setVariables();
-
-	}, 5);
-
-}//drawSpiros
-
-
 pt.spiroGraphFormula.setVariables = function() {
 
 	var R = getRandomNumber(15, 100);
@@ -135,6 +121,8 @@ pt.spiroGraphFormula.setVariables = function() {
 
 	//Draw the spirographs R, r, rho, alpha, length, start, color, thickness, offset
 	pt.spiroGraphFormula.calculateHypocycloid( R, r, rho, alpha, length, start, color, thickness, translation);
+
+	pt.spiroGraphFormula.drawSpirographs = requestAnimationFrame(pt.spiroGraphFormula.setVariables);
 
 }//setVariables
 
