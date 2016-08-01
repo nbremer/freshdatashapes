@@ -31,7 +31,7 @@ pt.slideIdToFunctions = {
   },
   'exo-planets': {
     'init': function() {
-      pt.exoplanets.init(planets);
+      pt.exoplanets.init();
     },
     '-1': function() {
       pt.exoplanets.rotatePlanets();
@@ -97,9 +97,6 @@ pt.slideIdToFunctions = {
     6: function() {
       pt.spiroGraph.spiro8();
     }
-    // 7: function() {
-    //   pt.spiroGraph.spiro9();
-    // }
   },
   'guilloche': {
     'init': function() {
@@ -162,6 +159,9 @@ function removeSVGs() {
 
   //Remove (heavy) all existing svgs currently running
   d3.select('#hexagon-showcase #hexagonShowcase svg').remove();
+
+  //Stop spiro drawing
+  clearInterval(pt.spiroGraphFormula.spiroInterval);
 
   //Make the planet timer stop
   pt.exoplanets.keepPlanetsRotating = false;
