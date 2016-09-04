@@ -10,14 +10,15 @@ pt.hexagonShowcase.init = function() {
 	///////////////////////////////////////////////////////////////////////////	
 
 	var margin = {
-		top: 10,
+		top: 250,
 		right: 0,
-		bottom: 10,
+		bottom: 250,
 		left: 0
 	};
-	var width = $(".slides").width()*0.75 - margin.left - margin.right;
-	var height = $(".slides").height()*0.6 - margin.top - margin.bottom;
-				
+	var width = $(".slides").width()*0.95 - margin.left - margin.right;
+	var height = $(".slides").height()*1 - margin.top - margin.bottom;
+	pt.hexagonShowcase.height = height;		
+
 	//SVG container
 	pt.hexagonShowcase.svg = d3.select('#hexagon-showcase #hexagonShowcase')
 		.append("svg")
@@ -37,6 +38,8 @@ pt.hexagonShowcase.init = function() {
 		hexHeight = 2 * hexRadius;
 	var hexagonPoly = [[0,-1],[SQRT3/2,0.5],[0,1],[-SQRT3/2,0.5],[-SQRT3/2,-0.5],[0,-1],[SQRT3/2,-0.5]];
 	var hexagonPath = "m" + hexagonPoly.map(function(p){ return [p[0]*hexRadius, p[1]*hexRadius].join(','); }).join('l') + "z";
+
+	pt.hexagonShowcase.hexRadius = hexRadius;
 
 	///////////////////////////////////////////////////////////////////////////
 	///////////////// Create defs for all gradients and filters ///////////////
@@ -245,121 +248,126 @@ pt.hexagonShowcase.init = function() {
     	.attr("cy", function(d) { return d.rHex * Math.sin(d.theta); })
       	.attr("r", 0)
       	.style("fill", "url(#gradientRainbowIntro)")
-		.style("opacity", 0.7)
-		.each(move);
-
-	pt.hexagonShowcase.circle.transition("grow")
-		.duration(function(d,i) { return Math.random()*2000+500; })
-		.delay(function(d,i) { return Math.random()*3000;})
-		.attr("r", function(d,i) { return d.r; });
-
-	// //Get a better overview of the gradient - for testing
-	// pt.hexagonShowcase.circleWrapper.append("rect")
-	// 	.attr("x", -hexWidth)
-	// 	.attr("y", -hexHeight)
-	// 	.attr("width", hexWidth*2)
-	// 	.attr("height", hexHeight*2)
-	// 	.style("fill", "url(#animatedGradientIntroSlide)");
+		.style("opacity", 0.7);
 
 	///////////////////////////////////////////////////////////////////////////
 	///////////////////////// Place Hexagon in center /////////////////////////
 	///////////////////////////////////////////////////////////////////////////	
 
 	//Place a hexagon on the scene
-	svg.append("path")
+	pt.hexagonShowcase.hexagonOutline = svg.append("path")
 		.attr("class", "hexagon")
 		.attr("d", "M" + (width/2) + "," + (height/2) + hexagonPath)
 		.style("stroke", "#d8d8d8")
 		.style("stroke-width", "7px")
-		.style("fill", "none");
+		.style("fill", "none")
+		.style("opacity", 0);
+
+	///////////////////////////////////////////////////////////////////////////
+	////////////////////////////// Create title ///////////////////////////////
+	///////////////////////////////////////////////////////////////////////////	
+
+	pt.hexagonShowcase.title = svg.append("text")
+		.attr("id", "title")
+		.attr("x", width/2)
+		.attr("y", height/2 + 70)
+		.text("fresh data shapes");
+
+	pt.hexagonShowcase.name = svg.append("text")
+		.attr("id","name")
+		.attr("x", width/2)
+		.attr("y", height/2 - 30)
+		.text("Nadieh Bremer");
 
 	///////////////////////////////////////////////////////////////////////////
 	///////////////////////////// Fade out title //////////////////////////////
 	///////////////////////////////////////////////////////////////////////////	
 
 	//Hide title (in case you move in from the back)
-	d3.selectAll("#hexagon-showcase #title, #hexagon-showcase #twitter")
-		.style("opacity", 0);
-
-	///////////////////////////////////////////////////////////////////////////
-	////////////////////// Circle movement inside hexagon /////////////////////
-	///////////////////////////////////////////////////////////////////////////	
-
-	//General idea from Maarten Lambrecht's block: http://bl.ocks.org/maartenzam/f35baff17a0316ad4ff6
-	function move(d) {
-		var currentx = parseFloat(d3.select(this).attr("cx")),
-		 	//currenty = parseFloat(d3.select(this).attr("cy")),
-			radius = d.r;
-
-		//Randomly define which quadrant to move next
-		var sideX = currentx > 0 ? -1 : 1,
-			sideY = Math.random() > 0.5 ? 1 : -1,
-			randSide = Math.random();
-
-		var newx,
-			newy;
-
-		//Move new locations along the vertical sides in 33% of the cases
-		if (randSide > 0.66) {
-			newx = sideX * 0.5 * SQRT3 * hexRadius - sideX*radius;
-			newy = sideY * Math.random() * 0.5 * hexRadius - sideY*radius;
-		} else {
-			//Choose a new x location randomly, 
-			//the y position will be calculated later to lie on the hexagon border
-			newx = sideX * Math.random() * 0.5 * SQRT3 * hexRadius;
-			//Otherwise calculate the new Y position along the hexagon border 
-			//based on which quadrant the random x and y gave
-			if (sideX > 0 && sideY > 0) {
-				newy = hexRadius - (1/SQRT3)*newx;
-			} else if (sideX > 0 && sideY <= 0) {
-				newy = -hexRadius + (1/SQRT3)*newx;
-			} else if (sideX <= 0 && sideY > 0) {
-				newy = hexRadius + (1/SQRT3)*newx;
-			} else if (sideX <= 0 && sideY <= 0) {
-				newy = -hexRadius - (1/SQRT3)*newx;
-			}//else
-
-			//Take off a bit so it seems that the circles truly only touch the edge
-			var offSetX = radius * Math.cos( 60 * Math.PI/180),
-				offSetY = radius * Math.sin( 60 * Math.PI/180);
-			newx = newx - sideX*offSetX;
-			newy = newy - sideY*offSetY;
-		}//else
-
-		//Transition the circle to its new location
-		d3.select(this)
-			.transition("moveing")
-			.duration(3000 + 4000*Math.random())
-			.ease("linear")
-			.attr("cy", newy)
-			.attr("cx", newx)
-			.each("end", move);
-
-	}//function move
+	d3.selectAll("#hexagon-showcase #title, #hexagon-showcase #name")
+		.style("opacity", 1);
 
 	pt.hexagonShowcase.direction = "forward";
+	pt.hexagonShowcase.fragment = "start";
 
 }//init
 
-pt.hexagonShowcase.gradient = function( ) {
+pt.hexagonShowcase.setup = function() {
 
-	//Show title if you're moving forward
-	d3.selectAll("#hexagon-showcase #title, #hexagon-showcase #twitter")
+	//Move titles, in case you move backward
+	pt.hexagonShowcase.name
+		.style("opacity", 1)
+		.transition().duration(1000)
+		.attr("y", pt.hexagonShowcase.height/2 - 30)
+		.style("font-size", 140);
+	pt.hexagonShowcase.title
+		.style("opacity", 1)
+		.transition().duration(1000)
+		.attr("y", pt.hexagonShowcase.height/2 + 70);
+
+	//Hide the hexagon outline
+	pt.hexagonShowcase.hexagonOutline
+		.transition().duration(1000)
+		.style("opacity", 0);
+
+	//Stop circles and hide
+	pt.hexagonShowcase.keepMoving = false;
+	pt.hexagonShowcase.circle
+		.transition("grow").duration(1000)
+		.attr("r", 0);
+
+}//setup
+
+pt.hexagonShowcase.gradient = function() {
+
+	//Move titles outward
+	pt.hexagonShowcase.name
+		.transition("move").duration(1500)
+		.attr("y", pt.hexagonShowcase.height/2 - pt.hexagonShowcase.hexRadius - 60)
+		.style("font-size", 90);
+	pt.hexagonShowcase.title
+		.transition().duration(1500)
+		.attr("y", pt.hexagonShowcase.height/2 + pt.hexagonShowcase.hexRadius + 120);
+
+	//Hide the titles after a certain time
+	d3.selectAll("#hexagon-showcase #title, #hexagon-showcase #name")
+		.style("opacity", 1)
+		.transition().duration(2000).delay(8000)
+		.style("opacity", 0);
+
+	//Circles are allowed to move again
+	pt.hexagonShowcase.keepMoving = true;
+
+	//Start moving the circles
+	pt.hexagonShowcase.circle.each(pt.hexagonShowcase.move);
+	//Make the circles big
+	pt.hexagonShowcase.circle
+		.transition("grow")
+		.duration(function(d,i) { return Math.random()*2000+500; })
+		.delay(function(d,i) { return Math.random()*3000;})
+		.attr("r", function(d,i) { return d.r; });
+
+	//Show the hexagon outline
+	pt.hexagonShowcase.hexagonOutline
+		.style("opacity", 0)
+		.transition().duration(2000)
 		.style("opacity", 1);
 
+	//Place gradient over circles
 	pt.hexagonShowcase.circle
       	.style("fill", "url(#gradientRainbowIntro)")
       	.transition("changeSize").duration(1000)
-      	.style("r", function(d) { return d.r })
+      	.attr("r", function(d) { return d.r })
 		.style("opacity", 0.8);
 
-	pt.hexagonShowcase.keepSliding = false;
+	//Stop gooey (in case you move backwards)
+	pt.hexagonShowcase.circleWrapper.style("filter", null);
+
+	if(pt.hexagonShowcase.direction === "forward") d3.select("#hexagon-showcase").attr("data-autoslide", 2700);
 
 }//gradient
 
 pt.hexagonShowcase.gooey = function( ) {
-
-	pt.hexagonShowcase.keepSliding = false;
 
     pt.hexagonShowcase.circleWrapper.style("filter", "url(#gooeyIntro)");
 
@@ -367,17 +375,8 @@ pt.hexagonShowcase.gooey = function( ) {
     	.style("fill", "url(#gradientRainbowIntro)")
     	.style("mix-blend-mode", null)
     	.transition("changeSize").duration(1000)
-      	.style("r", function(d) { return 15 + Math.random() * 30; })
+      	.attr("r", function(d) { return 15 + Math.random() * 30; })
 		.style("opacity", 1);
-
-	//Hide the title after a certain time
-	d3.selectAll("#hexagon-showcase #title, #hexagon-showcase #twitter")
-		.style("opacity", 1)
-		.transition().duration(2000).delay(10000)
-		.style("opacity", 0);
-
-	if(pt.hexagonShowcase.direction === "forward") d3.select("#hexagon-showcase").attr("data-autoslide", 3300);
-
 
 }//gooey
 
@@ -391,7 +390,7 @@ pt.hexagonShowcase.animated = function( ) {
       	.style("fill", "url(#animatedGradientIntroSlide)")
       	.style("mix-blend-mode", null)
       	.transition("changeOpacity").duration(1000)
-      	.style("r", function(d) { return d.r })
+      	.attr("r", function(d) { return d.r })
 		.style("opacity", 0.9)
 
 }//animated
@@ -405,7 +404,7 @@ pt.hexagonShowcase.slider = function( ) {
     pt.hexagonShowcase.circle
       	.style("fill", function(d,i) { return "url(#gradientSliderIntro-" + i + ")"; })
       	.transition("changeSize").duration(500)
-      	.style("r", function(d) { return d.r; })
+      	.attr("r", function(d) { return d.r; })
 		.style("opacity", 0.9);
 	
 	function moveGradient() {
@@ -450,7 +449,7 @@ pt.hexagonShowcase.slider = function( ) {
 	var start = 0,
 		range = 0.40,
 		end = 1-range,
-		duration = 2500;
+		duration = 1500;
 
 	moveGradient();
 
@@ -469,7 +468,7 @@ pt.hexagonShowcase.planet = function( ) {
 		.style("mix-blend-mode", null)
       	.style("fill", function(d,i) { return "url(#gradientPlanetIntro-" + i + ")"; })
       	.transition("changeSize").duration(500)
-    	.style("r", function(d) { return d.r })
+    	.attr("r", function(d) { return d.r })
 		.style("opacity", 0.8);
 
 }//planet
@@ -485,13 +484,17 @@ pt.hexagonShowcase.glow = function( ) {
       	.style("mix-blend-mode", null)
       	.style("fill", function(d,i) { return d.color; })
       	.transition("changeColor").duration(500)
-      	.style("r", function(d) { return d.r })
+      	.attr("r", function(d) { return d.r })
 		.style("opacity", 0.9);
+
+	pt.hexagonShowcase.fragment = "glow";
 
 }//glow
 
 pt.hexagonShowcase.colorBlend = function( ) {
     
+    pt.hexagonShowcase.keepMoving = true;
+
     d3.select("#hexagonShowcase .glowBackgroundRect")
 		.transition("changeColor").duration(500)
 		.style("opacity", 0);
@@ -501,13 +504,99 @@ pt.hexagonShowcase.colorBlend = function( ) {
     	.style("filter", null)
     	.style("fill", function(d,i) { return d.color; })
     	.transition("changeSize").duration(500)
-    	.style("r", function(d) { return d.r })
+    	.attr("r", function(d) { return d.r })
 		.style("opacity", 1);
 
 	d3.select("#hexagon-showcase").attr("data-autoslide", 0);
 	pt.hexagonShowcase.direction = "backward";
 
+	//In case you move backward
+	if(pt.hexagonShowcase.fragment === "start") {
+		//Start moving the circles
+		pt.hexagonShowcase.circle.each(pt.hexagonShowcase.move);
+	}//if
+
+	//Hide title (in case you move in from the back)
+	d3.selectAll("#hexagon-showcase #title, #hexagon-showcase #name")
+		.style("opacity", 0);
+
+	//Hide the hexagon outline (in case you move in from the back)
+	pt.hexagonShowcase.hexagonOutline
+		.transition().duration(500)
+		.style("opacity", 1);
+
+	//Move titles outward (in case you move in from the back)
+	pt.hexagonShowcase.title
+		.transition().duration(1500)
+		.attr("y", pt.hexagonShowcase.height/2 - pt.hexagonShowcase.hexRadius - 60);
+	pt.hexagonShowcase.name
+		.transition().duration(1500)
+		.attr("y", pt.hexagonShowcase.height/2 + pt.hexagonShowcase.hexRadius + 120)
+		.style("font-size", 70);
+
 }//colorBlend
 
+
+///////////////////////////////////////////////////////////////////////////
+////////////////////// Circle movement inside hexagon /////////////////////
+///////////////////////////////////////////////////////////////////////////	
+
+//General idea from Maarten Lambrecht's block: http://bl.ocks.org/maartenzam/f35baff17a0316ad4ff6
+pt.hexagonShowcase.move = function(d) {
+
+	if(!pt.hexagonShowcase.keepMoving) return;
+
+	var SQRT3 = Math.sqrt(3),
+		hexRadius = pt.hexagonShowcase.hexRadius;
+
+	var currentx = parseFloat(d3.select(this).attr("cx")),
+	 	//currenty = parseFloat(d3.select(this).attr("cy")),
+		radius = d.r;
+
+	//Randomly define which quadrant to move next
+	var sideX = currentx > 0 ? -1 : 1,
+		sideY = Math.random() > 0.5 ? 1 : -1,
+		randSide = Math.random();
+
+	var newx,
+		newy;
+
+	//Move new locations along the vertical sides in 33% of the cases
+	if (randSide > 0.66) {
+		newx = sideX * 0.5 * SQRT3 * hexRadius - sideX*radius;
+		newy = sideY * Math.random() * 0.5 * hexRadius - sideY*radius;
+	} else {
+		//Choose a new x location randomly, 
+		//the y position will be calculated later to lie on the hexagon border
+		newx = sideX * Math.random() * 0.5 * SQRT3 * hexRadius;
+		//Otherwise calculate the new Y position along the hexagon border 
+		//based on which quadrant the random x and y gave
+		if (sideX > 0 && sideY > 0) {
+			newy = hexRadius - (1/SQRT3)*newx;
+		} else if (sideX > 0 && sideY <= 0) {
+			newy = -hexRadius + (1/SQRT3)*newx;
+		} else if (sideX <= 0 && sideY > 0) {
+			newy = hexRadius + (1/SQRT3)*newx;
+		} else if (sideX <= 0 && sideY <= 0) {
+			newy = -hexRadius - (1/SQRT3)*newx;
+		}//else
+
+		//Take off a bit so it seems that the circles truly only touch the edge
+		var offSetX = radius * Math.cos( 60 * Math.PI/180),
+			offSetY = radius * Math.sin( 60 * Math.PI/180);
+		newx = newx - sideX*offSetX;
+		newy = newy - sideY*offSetY;
+	}//else
+
+	//Transition the circle to its new location
+	d3.select(this)
+		.transition("moveing")
+		.duration(3000 + 4000*Math.random())
+		.ease("linear")
+		.attr("cy", newy)
+		.attr("cx", newx)
+		.each("end", pt.hexagonShowcase.move);
+
+}//function move
 
 

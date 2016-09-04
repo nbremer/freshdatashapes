@@ -291,25 +291,25 @@ pt.spiroGraph.spiro4 = function() {
 
 // }//spiro
 
+// pt.spiroGraph.spiro5 = function() {
+
+// 	d3.selectAll("#spiroGraph .spirograph")
+// 		.transition("disappear").duration(500)
+// 		.style("opacity", 0)
+// 		.remove();
+
+// 	//Magenta and blue ribbon 13 points - one overlapping
+// 	for(var i = 0; i < 8 ; i++) {
+// 		var color = i > 3 ? "#00A6CA" : "#ED008C";
+// 		//R, r, rho, alpha, color, thickness, length, start, translation, random
+// 		pt.spiroGraph.addHypo(4*130, 4*30, 0.9, (360/(13*7))*i, color, 6, 4000);
+// 	}//for i
+
+// 	//if(pt.spiroGraph.direction === "forward") d3.select("#spiro-graph").attr("data-autoslide", 550);
+
+// }//spiro
+
 pt.spiroGraph.spiro5 = function() {
-
-	d3.selectAll("#spiroGraph .spirograph")
-		.transition("disappear").duration(500)
-		.style("opacity", 0)
-		.remove();
-
-	//Magenta and blue ribbon 13 points - one overlapping
-	for(var i = 0; i < 8 ; i++) {
-		var color = i > 3 ? "#00A6CA" : "#ED008C";
-		//R, r, rho, alpha, color, thickness, length, start, translation, random
-		pt.spiroGraph.addHypo(4*130, 4*30, 0.9, (360/(13*7))*i, color, 6, 4000);
-	}//for i
-
-	//if(pt.spiroGraph.direction === "forward") d3.select("#spiro-graph").attr("data-autoslide", 550);
-
-}//spiro
-
-pt.spiroGraph.spiro6 = function() {
 
 	d3.selectAll("#spiroGraph .spirograph")
 		.transition("disappear").duration(250)
@@ -340,7 +340,7 @@ pt.spiroGraph.spiro6 = function() {
 
 }//spiro
 
-pt.spiroGraph.spiro7 = function() {
+pt.spiroGraph.spiro6 = function() {
 
 	d3.selectAll("#spiroGraph .spirograph")
 		.transition("disappear").duration(250)
@@ -357,7 +357,7 @@ pt.spiroGraph.spiro7 = function() {
 
 }//spiro
 
-pt.spiroGraph.spiro8 = function() {
+pt.spiroGraph.spiro7 = function() {
 
 	d3.selectAll("#spiroGraph .spirograph")
 		.transition("disappear").duration(250)

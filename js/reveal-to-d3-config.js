@@ -8,24 +8,27 @@ pt.slideIdToFunctions = {
       pt.hexagonShowcase.init();
     },
     '-1': function() {
-      pt.hexagonShowcase.gradient();
+      pt.hexagonShowcase.setup();
     },
     0: function() {
-      pt.hexagonShowcase.gooey();
+      pt.hexagonShowcase.gradient();
     },
     1: function() {
-      pt.hexagonShowcase.animated();
+      pt.hexagonShowcase.gooey();
     },
     2: function() {
-      pt.hexagonShowcase.slider();
+      pt.hexagonShowcase.animated();
     },
     3: function() {
-      pt.hexagonShowcase.planet();
+      pt.hexagonShowcase.slider();
     },
     4: function() {
-      pt.hexagonShowcase.glow();
+      pt.hexagonShowcase.planet();
     },
     5: function() {
+      pt.hexagonShowcase.glow();
+    },
+    6: function() {
       pt.hexagonShowcase.colorBlend();
     }
   },
@@ -93,9 +96,6 @@ pt.slideIdToFunctions = {
     },
     5: function() {
       pt.spiroGraph.spiro7();
-    },
-    6: function() {
-      pt.spiroGraph.spiro8();
     }
   },
   'guilloche': {
@@ -159,6 +159,7 @@ function removeSVGs() {
 
   //Remove (heavy) all existing svgs currently running
   d3.select('#hexagon-showcase #hexagonShowcase svg').remove();
+  pt.hexagonShowcase.keepMoving = false;
 
   //Stop spiro drawing
   cancelAnimationFrame(pt.spiroGraphFormula.drawSpirographs);

@@ -19,9 +19,9 @@
 
 		<!-- Google fonts -->
 		<link href='https://fonts.googleapis.com/css?family=Sue+Ellen+Francisco' rel='stylesheet' type='text/css'>
-		<link href="https://fonts.googleapis.com/css?family=Quicksand:300,400" rel="stylesheet">
 		<link href='https://fonts.googleapis.com/css?family=Bad+Script' rel='stylesheet' type='text/css'>
 		<link href="https://fonts.googleapis.com/css?family=Oxygen:300,400" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Comfortaa:300,400,700" rel="stylesheet">
 
 
 		<!-- Printing and PDF exports -->
@@ -45,7 +45,7 @@
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
 
-				<section data-external="slides/slide_00/beforeStarting.html"></section>
+				<!-- <section data-external="slides/slide_00/beforeStarting.html"></section> -->
 				<section data-external="slides/slide_01/hexagonShowcase.html"></section>
 				<section data-external="slides/slide_07/exoplanets.html"></section>
 				<section data-external="slides/slide_05/spiroGraphFormula.html"></section>
@@ -114,7 +114,7 @@
 				transition: 'fade', // none/fade/slide/convex/concave/zoom
 
 				math: {
-			        mathjax: 'https://cdn.mathjax.org/mathjax/latest/MathJax.js', //'plugin/math/MathJax-2.6/MathJax.js',
+			        mathjax: 'plugin/math/MathJax-2.6/MathJax.js', //'https://cdn.mathjax.org/mathjax/latest/MathJax.js',
 			        config: 'TeX-AMS_SVG'  // See http://docs.mathjax.org/en/latest/config-files.html
 			    },
 
@@ -122,7 +122,7 @@
 				dependencies: [
 					{ src: 'plugin/external/external.js', condition: function() { return !!document.querySelector( '[data-external]' ); } },
 					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
-					//{ src: 'plugin/highlight/highlight.js', async: false, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/highlight/highlight.js', async: false, callback: function() { hljs.initHighlightingOnLoad(); } },
 					{ src: 'plugin/zoom-js/zoom.js', async: true },
 					{ src: 'plugin/notes/notes.js', async: true },
         			{ src: 'plugin/math/math.js', async: true } // MathJax
@@ -135,6 +135,9 @@
 		    	d3.select('#hexagon-showcase #hexagonShowcase svg').remove();
 		    	d3.select('#end-slide #endSlide svg').remove();
 			} );
+
+			//Because there is no 1st empty slide, call the slideChange event like this
+			setTimeout(function() { pt.handleEvent(true, "hexagon-showcase"); }, 500);
 
 		</script>
 

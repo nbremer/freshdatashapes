@@ -2,10 +2,15 @@
 
 var pt = pt || {};
 
-pt.handleEvent = function(isSlideEvent) {
+pt.handleEvent = function(isSlideEvent, slideID) {
   'use strict';
 
-  var currentSlideId = Reveal.getCurrentSlide().id;
+  if(slideID) {
+    var currentSlideId = slideID;
+  } else {
+    var currentSlideId = Reveal.getCurrentSlide().id;
+  }
+  
   var currentFragment = Reveal.getIndices().f;
 
   // Don't go any further if the slide has no ID (i.e. the string is empty).
@@ -40,8 +45,6 @@ pt.handleEvent = function(isSlideEvent) {
 
 pt.handleSlideEvent = function() {
   'use strict';
-  //Remove all the svg's drawn
-  //pt.selectAll("svg").remove();
   pt.handleEvent(true);
 };
 

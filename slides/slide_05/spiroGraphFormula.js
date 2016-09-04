@@ -1,30 +1,28 @@
 pt.spiroGraphFormula = pt.spiroGraphFormula || {};
 
 pt.spiroGraphFormula.init = function() {
-	
-	//Remove any existing svgs
-	d3.select('#spiro-graph-formula #spiroGraphFormula svg').remove();
 
 	///////////////////////////////////////////////////////////////////////////
-	//////////////////// Set up and initiate svg containers ///////////////////
+	///////////////////// Set up and initiate containers //////////////////////
 	///////////////////////////////////////////////////////////////////////////	
+
+	pt.spiroGraphFormula.width = $(".slides").width();
+	pt.spiroGraphFormula.height = $(".slides").height();
 
 	//Create canvas
     pt.spiroGraphFormula.canvas = document.getElementById("spiroCanvas");
-    pt.spiroGraphFormula.canvas.width = $(".slides").width();
-    pt.spiroGraphFormula.canvas.height = $(".slides").height();
+    pt.spiroGraphFormula.canvas.width = pt.spiroGraphFormula.width;
+    pt.spiroGraphFormula.canvas.height = pt.spiroGraphFormula.height;
     pt.spiroGraphFormula.ctx = pt.spiroGraphFormula.canvas.getContext('2d');
 
-	pt.spiroGraphFormula.width= $(".slides").width();
-	pt.spiroGraphFormula.height = $(".slides").height();
-
 	pt.spiroGraphFormula.ctx.globalCompositeOperation = "multiply";
+	pt.spiroGraphFormula.ctx.lineCap = "butt";
 
 }//init
 
 pt.spiroGraphFormula.resetOpacity = function() {
 	
-	//Show everything (in case you move backward)
+	//In case you move backward
 	d3.selectAll("#spiro-graph-formula .formula")
 		.transition().duration(250)
 		.style("color", "#adadad");
@@ -40,7 +38,7 @@ pt.spiroGraphFormula.showSpiros = function() {
 
 	//Calculate and draw the spirographs
 	setTimeout( function() {
-		pt.spiroGraphFormula.drawSpirographs = requestAnimationFrame(pt.spiroGraphFormula.setVariables);
+		requestAnimationFrame(pt.spiroGraphFormula.setVariables);
 	}, 500);
 
 }//showSpiros
@@ -59,11 +57,11 @@ pt.spiroGraphFormula.calculateHypocycloid = function(R, r, rho, alpha, length, s
     	y0 = 5e5,
     	oldX, oldY;
   
+  	//Translate the canvas
   	ctx.translate(offset[0], offset[1]);
   	ctx.strokeStyle = color;
     ctx.lineWidth = typeof thickness === "undefined" ? 4 : thickness;
-    ctx.lineCap = "butt";
-
+    
     //Create the x and y coordinates for the spirograph
     for(var theta = startNum; theta < (startNum+numTheta); theta += 1){
         var t = (Math.PI / 180) * theta ;
@@ -91,9 +89,11 @@ pt.spiroGraphFormula.calculateHypocycloid = function(R, r, rho, alpha, length, s
         if(theta === startNum) {
         	x0 = x;
         	y0 = y;
-        }//if                            
+        }//if  
+
     } //for theta
 
+    //Translate the canvas back to the top left
     ctx.translate(-offset[0], -offset[1]);
 	
 }//function calculateHypocycloid
@@ -109,19 +109,22 @@ pt.spiroGraphFormula.setVariables = function() {
 	var translation = [getRandomNumber(0, pt.spiroGraphFormula.width), getRandomNumber(0, pt.spiroGraphFormula.height)];
 
 	//Use the location of the center to find a color
-	var color = pt.spiroGraphFormula.yiq2rgb(0.6, 
-		translation[0]/pt.spiroGraphFormula.width - 0.5 + Math.random()/10 * (Math.random() > 0.5 ? 1 : -1), 
-		translation[1]/pt.spiroGraphFormula.height - 0.5 + Math.random()/10 * (Math.random() > 0.5 ? 1 : -1));
-	//colors[ i%colors.length ];
+	//http://blockbuilder.org/mbostock/76342abc327062128604
+	var dx = translation[0] - pt.spiroGraphFormula.width/2 ,
+		dy = translation[1] - pt.spiroGraphFormula.height/2; 
+	var color = d3.lab(100 - (dx * dx + dy * dy) / 30000, dx / 20, dy / 20);
+	// var color = pt.spiroGraphFormula.yiq2rgb(0.6, 
+	// 	translation[0]/pt.spiroGraphFormula.width - 0.5 + Math.random()/10 * (Math.random() > 0.5 ? 1 : -1), 
+	// 	translation[1]/pt.spiroGraphFormula.height - 0.5 + Math.random()/10 * (Math.random() > 0.5 ? 1 : -1));
 	
 	var thickness = Math.random();
-
 	var length = getRandomNumber(0, 10e3) + 5000;
 	var start = getRandomNumber(0, 10e3);
 
-	//Draw the spirographs R, r, rho, alpha, length, start, color, thickness, offset
+	//Draw the spirographs
 	pt.spiroGraphFormula.calculateHypocycloid( R, r, rho, alpha, length, start, color, thickness, translation);
 
+	//Repeat
 	pt.spiroGraphFormula.drawSpirographs = requestAnimationFrame(pt.spiroGraphFormula.setVariables);
 
 }//setVariables
