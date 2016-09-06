@@ -536,7 +536,7 @@ pt.exoplanets.movePlanets = function() {
 		var theta = d.theta * Math.PI / 180;
 
 		var radius = pt.exoplanets.radiusSizer*d.Radius;
-		if ( !isMobile ) { 
+		if ( !isMobile && !is_safari ) { 
 			var centerX = pt.exoplanets.locate(d, "x") + pt.exoplanets.width/2;
 			var centerY = pt.exoplanets.locate(d, "y") + pt.exoplanets.height/2;
 		} else {
@@ -587,7 +587,7 @@ pt.exoplanets.movePlanets = function() {
       	ctx.closePath();
 	}//for i
 
-	if ( !isMobile ) {
+	if ( !isMobile && !is_safari) {
 		pt.exoplanets.rotatePlanets = requestAnimationFrame(pt.exoplanets.movePlanets);
     }//if
 
@@ -651,7 +651,7 @@ pt.exoplanets.shrinkPlanets = function(delayTime) {
 		pt.exoplanets.radiusSizer = originalSizer - deltaSizer * decrease;
 		if( pt.exoplanets.radiusSizer <= finalSizer ) { 
 			clearInterval(shrinkInterval);
-			if ( isMobile ) { pt.exoplanets.movePlanets(); }
+			if ( isMobile || is_safari ) { pt.exoplanets.movePlanets(); }
 		}//if
 	}//shrink
 
@@ -679,7 +679,7 @@ pt.exoplanets.growPlanets = function(delayTime) {
 		pt.exoplanets.radiusSizer = originalSizer - deltaSizer * decrease;
 		if ( pt.exoplanets.radiusSizer >= finalSizer ) { 
 			clearInterval(growInterval); 
-			if ( isMobile ) { pt.exoplanets.movePlanets(); }
+			if ( isMobile || is_safari ) { pt.exoplanets.movePlanets(); }
 		}//if
 	}//grow
 
@@ -696,11 +696,11 @@ pt.exoplanets.showEllipse = function(i, opacity) {
 
 	//Find the planet to highlight
 	planets.forEach(function(d,i) { if(d.ID === planet) { d.stroke = true; } });
-	if ( isMobile ) { pt.exoplanets.movePlanets(); }
+	if ( isMobile || is_safari ) { pt.exoplanets.movePlanets(); }
 
 	setTimeout(function() {
 		planets.forEach(function(d,i) { if(d.ID === planet) { d.stroke = false; } });
-		if ( isMobile ) { pt.exoplanets.movePlanets(); }
+		if ( isMobile || is_safari ) { pt.exoplanets.movePlanets(); }
 	}, 3000);
 
 }//showEllipse	
@@ -716,7 +716,7 @@ pt.exoplanets.highlight = function(planet, delayTime){
 		if(d.ID === planet) { d.stroke = true; }
 	});
 
-	if ( isMobile ) { pt.exoplanets.movePlanets(); }
+	if ( isMobile || is_safari ) { pt.exoplanets.movePlanets(); }
 	
 }//highlight
 
@@ -746,7 +746,7 @@ pt.exoplanets.bringBack = function(delayTime){
 		var decrease = easeIn( iteration++ * 0.075 ) ;
 		pt.exoplanets.ctx.globalAlpha = originalAlpha - deltaAlpha * decrease;
 		if( pt.exoplanets.ctx.globalAlpha >= finalAlpha ) { 
-			if ( isMobile ) { pt.exoplanets.movePlanets(); }
+			if ( isMobile || is_safari ) { pt.exoplanets.movePlanets(); }
 			clearInterval(fadeInInterval); 
 		}
 	}//fadeIn
@@ -779,7 +779,7 @@ pt.exoplanets.dim = function(delayTime) {
 		var decrease = easeIn( iteration++ * 0.075 ) ;
 		pt.exoplanets.ctx.globalAlpha = originalAlpha - deltaAlpha * decrease;
 		if( pt.exoplanets.ctx.globalAlpha <= finalAlpha ) { 
-			if ( isMobile ) { pt.exoplanets.movePlanets(); }
+			if ( isMobile || is_safari ) { pt.exoplanets.movePlanets(); }
 			clearInterval(fadeOutInterval); 
 		}
 	}//fadeOut

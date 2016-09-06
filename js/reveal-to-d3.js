@@ -18,6 +18,12 @@ pt.handleEvent = function(isSlideEvent, slideID) {
     return;
   }
 
+
+  //First remove any SVGs still present when changing a slide
+  if (isSlideEvent) {
+    removeSVGs();
+  }
+
   // If there is no entry corresponding to the current slide in the map, don't go further.
   var functions = pt.slideIdToFunctions[currentSlideId];
   if (functions == null) {

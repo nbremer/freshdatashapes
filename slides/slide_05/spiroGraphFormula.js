@@ -15,8 +15,11 @@ pt.spiroGraphFormula.init = function() {
     pt.spiroGraphFormula.canvas.height = pt.spiroGraphFormula.height;
     pt.spiroGraphFormula.ctx = pt.spiroGraphFormula.canvas.getContext('2d');
 
-	pt.spiroGraphFormula.ctx.globalCompositeOperation = "multiply";
+    pt.spiroGraphFormula.ctx.globalCompositeOperation = "multiply";
+
 	pt.spiroGraphFormula.ctx.lineCap = "butt";
+
+	pt.spiroGraphFormula.counter = 0;
 
 }//init
 
@@ -112,11 +115,10 @@ pt.spiroGraphFormula.setVariables = function() {
 	//http://blockbuilder.org/mbostock/76342abc327062128604
 	var dx = translation[0] - pt.spiroGraphFormula.width/2 ,
 		dy = translation[1] - pt.spiroGraphFormula.height/2; 
-	var color = d3.lab(100 - (dx * dx + dy * dy) / 30000, dx / 20, dy / 20);
+	var color = d3.rgb( d3.lab(100 - (dx * dx + dy * dy) / 30000, dx / 20, dy / 20) ).toString();
 	// var color = pt.spiroGraphFormula.yiq2rgb(0.6, 
 	// 	translation[0]/pt.spiroGraphFormula.width - 0.5 + Math.random()/10 * (Math.random() > 0.5 ? 1 : -1), 
-	// 	translation[1]/pt.spiroGraphFormula.height - 0.5 + Math.random()/10 * (Math.random() > 0.5 ? 1 : -1));
-	
+	// 	translation[1]/pt.spiroGraphFormula.height - 0.5 + Math.random()/10 * (Math.random() > 0.5 ? 1 : -1));	
 	var thickness = Math.random();
 	var length = getRandomNumber(0, 10e3) + 5000;
 	var start = getRandomNumber(0, 10e3);
@@ -124,8 +126,14 @@ pt.spiroGraphFormula.setVariables = function() {
 	//Draw the spirographs
 	pt.spiroGraphFormula.calculateHypocycloid( R, r, rho, alpha, length, start, color, thickness, translation);
 
-	//Repeat
-	pt.spiroGraphFormula.drawSpirographs = requestAnimationFrame(pt.spiroGraphFormula.setVariables);
+	pt.spiroGraphFormula.counter += 1;
+
+	//Repeat - only 10 times for mobile
+	if( !isMobile ) {
+		pt.spiroGraphFormula.drawSpirographs = requestAnimationFrame(pt.spiroGraphFormula.setVariables);
+	} else if (pt.spiroGraphFormula.counter < 10) {
+		pt.spiroGraphFormula.drawSpirographs = requestAnimationFrame(pt.spiroGraphFormula.setVariables);
+	}
 
 }//setVariables
 
